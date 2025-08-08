@@ -29,7 +29,8 @@ def inject_globals():
     return {
         'current_user': get_current_user(),
         'cart_count': get_cart_count(),
-        'cart_total': get_cart_total()
+        'cart_total': get_cart_total(),
+        'data_store': data_store
     }
 
 @app.route('/')
@@ -457,6 +458,27 @@ def admin_update_stock(product_id):
     if product:
         product.stock = int(request.form.get('stock', '0'))
         flash('Stock updated successfully!', 'success')
+    
+    return redirect(url_for('admin_products'))
+
+@app.route('/admin/edit_product', methods=['POST'])
+def admin_edit_product():
+    """Edit an existing product"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        return redirect(url_for('index'))
+    
+    product_id = int(request.form.get('product_id'))
+    product = data_store['products'].get(product_id)
+    
+    if product:
+        product.name = request.form.get('name')
+        product.description = request.form.get('description')
+        product.price = float(request.form.get('price', '0'))
+        product.category = request.form.get('category')
+        product.image_url = request.form.get('image_url')
+        product.stock = int(request.form.get('stock', '0'))
+        flash('Product updated successfully!', 'success')
     
     return redirect(url_for('admin_products'))
 

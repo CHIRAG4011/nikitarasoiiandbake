@@ -45,9 +45,9 @@
                         
                         <div id="newAddressForm" {% if addresses %}style="display:none;"{% endif %}>
                             <div class="mb-3">
-                                <label for="new_address" class="form-label">Full Address</label>
+                                <label for="new_address" class="form-label">Full Address <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="new_address" name="new_address" rows="3"
-                                          placeholder="Enter your complete delivery address"></textarea>
+                                          placeholder="Enter your complete delivery address" required></textarea>
                             </div>
                         </div>
                     </div>

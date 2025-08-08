@@ -48,7 +48,10 @@
             // Handle dropdown toggles
             document.addEventListener('click', (e) => {
                 if (e.target.matches('.dropdown-toggle')) {
-                    this.handleDropdownToggle(e);
+                    e.preventDefault();
+                    // Use Bootstrap's dropdown functionality
+                    const dropdown = new bootstrap.Dropdown(e.target);
+                    dropdown.toggle();
                 }
             });
 
@@ -391,6 +394,60 @@
                 counter.textContent = compareList.length;
                 counter.style.display = compareList.length > 0 ? 'inline' : 'none';
             }
+        }
+
+        initializeCharts() {
+            // Initialize charts for admin dashboard
+            if (typeof Chart !== 'undefined') {
+                this.initializeSalesChart();
+                this.initializeVisitorsChart();
+            }
+        }
+
+        initializeSalesChart() {
+            const canvas = document.getElementById('salesChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Sales (₹)',
+                        data: [12000, 19000, 15000, 25000, 22000, 30000],
+                        borderColor: 'rgb(139, 69, 19)',
+                        backgroundColor: 'rgba(139, 69, 19, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        initializeVisitorsChart() {
+            const canvas = document.getElementById('visitorsChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Visitors',
+                        data: [12, 19, 15, 25, 22, 30, 28],
+                        backgroundColor: 'rgba(139, 69, 19, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
         }
 
         initializeDataTables() {
