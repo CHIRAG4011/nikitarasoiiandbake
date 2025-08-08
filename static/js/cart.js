@@ -1,5 +1,5 @@
 /**
- * Sweet Crumbs Bakery - Cart Management
+ * NIKITA RASOI & BAKES - Cart Management
  * Handles shopping cart functionality and interactions
  */
 
@@ -292,9 +292,9 @@ class CartManager {
 
     // Utility method for formatting currency
     formatCurrency(amount) {
-        return new Intl.NumberFormat('en-US', {
+        return new Intl.NumberFormat('en-IN', {
             style: 'currency',
-            currency: 'USD'
+            currency: 'INR'
         }).format(amount);
     }
 }

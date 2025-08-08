@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Checkout - Sweet Crumbs Bakery{% endblock %}
+{% block title %}Checkout - NIKITA RASOI & BAKES{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -192,20 +192,20 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Items ({{ cart_count }}):</span>
-                        <span>${{ "%.2f"|format(cart_total) }}</span>
+                        <span>₹{{ "%.2f"|format(cart_total) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Delivery Fee:</span>
-                        <span>$5.00</span>
+                        <span>₹50.00</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Tax (8.5%):</span>
-                        <span>${{ "%.2f"|format((cart_total + 5.00) * 0.085) }}</span>
+                        <span>Tax (18%):</span>
+                        <span>₹{{ "%.2f"|format((cart_total + 50.00) * 0.18) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
-                        <strong class="text-brown">${{ "%.2f"|format((cart_total + 5.00) * 1.085) }}</strong>
+                        <strong class="text-brown">₹{{ "%.2f"|format((cart_total + 50.00) * 1.18) }}</strong>
                     </div>
                 </div>
             </div>
@@ -613,7 +613,7 @@ class CheckoutManager {
         // Update cart total display
         const cartTotalElements = document.querySelectorAll('.cart-total');
         cartTotalElements.forEach(element => {
-            element.textContent = '$0.00';
+            element.textContent = '₹0.00';
         });
         
         // Update cart count display

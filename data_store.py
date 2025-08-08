@@ -26,7 +26,7 @@ def init_data_store():
     admin_user = User(
         user_id=1,
         username='admin',
-        email='admin@sweetcrumbsbakery.com',
+        email='admin@nikitarasoi.com',
         password_hash=generate_password_hash('admin123'),
         is_admin=True
     )
@@ -38,7 +38,7 @@ def init_data_store():
         {
             'name': 'Artisan Sourdough Bread',
             'description': 'Traditional sourdough bread made with our signature starter, fermented for 24 hours for that perfect tangy flavor.',
-            'price': 8.99,
+            'price': 89.99,
             'category': 'Bread',
             'image_url': 'https://pixabay.com/get/gf46697f3b2eb0f69055e68cf462fe7f12f666a1cef093298d99ac12155b9f9a73786df5c026a3d306610f736380e291652992b984cc3e2305bb1f72dd7b7831a_1280.jpg',
             'stock': 15
@@ -46,7 +46,7 @@ def init_data_store():
         {
             'name': 'Fresh Croissants',
             'description': 'Buttery, flaky croissants made fresh daily with premium French butter. Perfect for breakfast or afternoon tea.',
-            'price': 12.99,
+            'price': 129.99,
             'category': 'Pastries',
             'image_url': 'https://pixabay.com/get/g7fc235a8396e1e878415cdd61ade6fd8a773e2667829a11c6e2118808a681b4abd2a480212ead51ada7e326f7f210cdbe2aac2c1c8a0ce9310ea0497f2c98d88_1280.jpg',
             'stock': 24
@@ -54,7 +54,7 @@ def init_data_store():
         {
             'name': 'Chocolate Chip Muffins',
             'description': 'Moist and fluffy muffins loaded with premium chocolate chips. A family favorite!',
-            'price': 15.99,
+            'price': 159.99,
             'category': 'Muffins',
             'image_url': 'https://pixabay.com/get/g002d90cded0d0d8029098ba11a7e534bc2a16e58b1b935f8abf23e301924125103d7e7aa0971c7d3b6044f125aace9b89bfa10cb192bce99d1393e0914d96939_1280.jpg',
             'stock': 18
@@ -62,7 +62,7 @@ def init_data_store():
         {
             'name': 'Danish Pastries',
             'description': 'Traditional Danish pastries with various fillings including cream cheese, fruit preserves, and custard.',
-            'price': 18.99,
+            'price': 189.99,
             'category': 'Pastries',
             'image_url': 'https://pixabay.com/get/gaffffc737998f81ca3a19e76aa6ff9177b067d35a05e7f8c25e830c8deac60f5febbf4447fe4bc429641c026c2764c8c508a364e12bc0e06b6a6b6b4196335fd_1280.jpg',
             'stock': 12
@@ -70,7 +70,7 @@ def init_data_store():
         {
             'name': 'Whole Wheat Rolls',
             'description': 'Healthy whole wheat dinner rolls, perfect for any meal. Made with organic flour and seeds.',
-            'price': 6.99,
+            'price': 69.99,
             'category': 'Bread',
             'image_url': 'https://pixabay.com/get/ge311c6a94d5e6e9d79f52733a022bfded80843d182c630b20a3b3b4c6df7bb33f610ab05806b5193f036f3cfb9bb1b651bb14c71317129c47140528a6e49e7e6_1280.jpg',
             'stock': 20
@@ -78,7 +78,7 @@ def init_data_store():
         {
             'name': 'Cinnamon Rolls',
             'description': 'Soft, gooey cinnamon rolls with cream cheese frosting. Baked fresh every morning.',
-            'price': 14.99,
+            'price': 149.99,
             'category': 'Pastries',
             'image_url': 'https://pixabay.com/get/ge4a523739a8b375a4398fa7e3e9fa0b5fa31395997465b711435e0fd5a022c2ff5e600d688fd11addd7e9b811f542ce892b7db1d407390227e4cfda1bbf477dd_1280.jpg',
             'stock': 16
@@ -86,7 +86,7 @@ def init_data_store():
         {
             'name': 'Artisan Bagels',
             'description': 'Hand-rolled bagels available in various flavors: plain, sesame, poppy seed, and everything.',
-            'price': 9.99,
+            'price': 99.99,
             'category': 'Bread',
             'image_url': 'https://pixabay.com/get/g16dc05f5f036ac44088b8762b08a8f4fba9c3d54104d0f05f20405769619f798061a01280002dbcbb5a47914af1b25e6436eb32bcd4cb4682d88c658e14ff435_1280.jpg',
             'stock': 22
@@ -94,7 +94,7 @@ def init_data_store():
         {
             'name': 'Fruit Tarts',
             'description': 'Beautiful individual fruit tarts with pastry cream and fresh seasonal fruits.',
-            'price': 22.99,
+            'price': 229.99,
             'category': 'Desserts',
             'image_url': 'https://pixabay.com/get/g686d80765ed6bf3ee31605efc8f64b836790a4a5520e1d6c6612c4093dabbe17dfec22312d97234015f0cd6a400527d092ea3a0603e2b30529c4cd59a2f45308_1280.jpg',
             'stock': 8

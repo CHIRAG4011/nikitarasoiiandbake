@@ -1,8 +1,8 @@
-# Sweet Crumbs Bakery
+# NIKITA RASOI & BAKES
 
 ## Overview
 
-Sweet Crumbs Bakery is a Flask-based e-commerce web application for an online bakery business. The application provides a complete shopping experience with product browsing, cart management, order placement, user authentication, and admin management capabilities. It features a warm, bakery-themed design with brown and cream color schemes, product catalogs with search and filtering, shopping cart functionality, order tracking, user profile management, and comprehensive admin tools for managing products, orders, and analytics.
+NIKITA RASOI & BAKES is a Flask-based e-commerce web application for an online bakery business. The application provides a complete shopping experience with product browsing, cart management, order placement, user authentication, and admin management capabilities. It features a warm, bakery-themed design with brown and cream color schemes, product catalogs with search and filtering, shopping cart functionality, order tracking, user profile management, and comprehensive admin tools for managing products, orders, and analytics. The application has been fully rebranded from "Sweet Crumbs Bakery" to "NIKITA RASOI & BAKES" and converted to use Indian Rupee (INR) currency throughout.
 
 ## User Preferences
 
@@ -54,10 +54,12 @@ Preferred communication style: Simple, everyday language.
 - **Bootstrap 5**: CSS framework loaded via CDN for responsive design
 - **Font Awesome 6**: Icon library loaded via CDN for UI elements
 - **Chart.js**: JavaScript charting library for admin analytics dashboard
+- **Currency Formatting**: JavaScript uses Intl.NumberFormat with en-IN locale for Indian Rupee formatting
 
 ### Email Service
 - **SMTP Configuration**: Configurable mail server settings (defaults to Gmail SMTP)
 - **Environment Variables**: MAIL_SERVER, MAIL_PORT, MAIL_USERNAME, MAIL_PASSWORD, MAIL_DEFAULT_SENDER
+- **Email Templates**: Order confirmation emails using NIKITA RASOI & BAKES branding and INR currency formatting
 
 ### Image Resources
 - **Pixabay**: External image hosting for product photos and bakery imagery
@@ -67,3 +69,16 @@ Preferred communication style: Simple, everyday language.
 - **Environment Configuration**: Development vs production settings via environment variables
 - **Debug Mode**: Flask debug mode for development with hot reloading
 - **Logging**: Python logging module for application monitoring and debugging
+
+## Recent Changes (August 2025)
+
+### Complete Rebranding and Currency Conversion
+- **Business Name**: Changed from "Sweet Crumbs Bakery" to "NIKITA RASOI & BAKES" across all templates, JavaScript files, and email content
+- **Currency Conversion**: Full conversion from USD ($) to Indian Rupee (₹) throughout the application
+- **Product Pricing**: Updated all product prices to appropriate INR values (multiplied by ~10x for realistic Indian pricing)
+- **Delivery Fees**: Updated from $5.00 to ₹50.00, free delivery threshold changed from $50 to ₹500
+- **Tax Rates**: Updated from 8.5% US tax to 18% Indian GST rate
+- **Admin Email**: Changed from admin@sweetcrumbsbakery.com to admin@nikitarasoi.com
+- **JavaScript Localization**: Updated currency formatting to use en-IN locale with INR currency
+- **Template Fixes**: Fixed analytics template slicing and undefined variable errors
+

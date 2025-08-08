@@ -94,11 +94,11 @@ def send_order_confirmation_email(user_email, order):
             body=f'''
 Dear Customer,
 
-Thank you for your order at Sweet Crumbs Bakery!
+Thank you for your order at NIKITA RASOI & BAKES!
 
 Order Details:
 Order ID: #{order.id}
-Total: ${order.total:.2f}
+Total: ₹{order.total:.2f}
 Status: {order.status.title()}
 
 Your delicious baked goods will be prepared with care and delivered to:
@@ -106,10 +106,10 @@ Your delicious baked goods will be prepared with care and delivered to:
 
 You can track your order status in your account dashboard.
 
-Thank you for choosing Sweet Crumbs Bakery!
+Thank you for choosing NIKITA RASOI & BAKES!
 
 Best regards,
-The Sweet Crumbs Team
+The NIKITA RASOI & BAKES Team
             '''
         )
         mail.send(msg)

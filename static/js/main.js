@@ -1,5 +1,5 @@
 /**
- * Sweet Crumbs Bakery - Main JavaScript
+ * NIKITA RASOI & BAKES - Main JavaScript
  * Core functionality and utility functions
  */
 
@@ -7,7 +7,7 @@
     'use strict';
 
     // Application namespace
-    window.SweetCrumbs = window.SweetCrumbs || {};
+    window.NikitaRasoi = window.NikitaRasoi || {};
 
     /**
      * Main application class
@@ -503,9 +503,9 @@
         }
 
         formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
+            return new Intl.NumberFormat('en-IN', {
                 style: 'currency',
-                currency: 'USD'
+                currency: 'INR'
             }).format(amount);
         }
 
@@ -520,13 +520,13 @@
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', () => {
-        window.SweetCrumbs.app = new BakeryApp();
+        window.NikitaRasoi.app = new BakeryApp();
     });
 
     // Expose utilities globally
-    window.SweetCrumbs.utils = {
-        formatCurrency: (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount),
-        formatDate: (date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(date)),
+    window.NikitaRasoi.utils = {
+        formatCurrency: (amount) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount),
+        formatDate: (date) => new Intl.DateTimeFormat('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(date)),
         debounce: function(func, wait) {
             let timeout;
             return function executedFunction(...args) {

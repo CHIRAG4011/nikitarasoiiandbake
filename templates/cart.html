@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Shopping Cart - Sweet Crumbs Bakery{% endblock %}
+{% block title %}Shopping Cart - NIKITA RASOI & BAKES{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -23,7 +23,7 @@
                         <div class="col-md-4">
                             <h6 class="mb-1">{{ item.product.name }}</h6>
                             <p class="text-muted small mb-0">{{ item.product.category }}</p>
-                            <p class="text-brown fw-bold">${{ "%.2f"|format(item.product.price) }}</p>
+                            <p class="text-brown fw-bold">₹{{ "%.2f"|format(item.product.price) }}</p>
                         </div>
                         <div class="col-md-3">
                             <form method="post" action="{{ url_for('update_cart') }}" class="d-flex align-items-center">
@@ -35,7 +35,7 @@
                             </form>
                         </div>
                         <div class="col-md-2 text-end">
-                            <p class="fw-bold mb-1">${{ "%.2f"|format(item.total) }}</p>
+                            <p class="fw-bold mb-1">₹{{ "%.2f"|format(item.total) }}</p>
                         </div>
                         <div class="col-md-1 text-end">
                             <a href="{{ url_for('remove_from_cart_route', product_id=item.product.id) }}" 
@@ -58,16 +58,16 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal:</span>
-                        <span>${{ "%.2f"|format(cart_total) }}</span>
+                        <span>₹{{ "%.2f"|format(cart_total) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Delivery Fee:</span>
-                        <span>$5.00</span>
+                        <span>₹50.00</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between mb-3">
                         <strong>Total:</strong>
-                        <strong class="text-brown">${{ "%.2f"|format(cart_total + 5.00) }}</strong>
+                        <strong class="text-brown">₹{{ "%.2f"|format(cart_total + 50.00) }}</strong>
                     </div>
                     
                     {% if current_user %}
@@ -93,7 +93,7 @@
                     <ul class="list-unstyled small">
                         <li><i class="fas fa-check text-success me-2"></i>Same-day delivery available</li>
                         <li><i class="fas fa-check text-success me-2"></i>Orders before 2 PM qualify</li>
-                        <li><i class="fas fa-check text-success me-2"></i>Free delivery on orders over $50</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Free delivery on orders over ₹500</li>
                     </ul>
                 </div>
             </div>
