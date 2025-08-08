@@ -147,12 +147,17 @@ def checkout():
 @app.route('/place_order', methods=['POST'])
 def place_order():
     """Place an order"""
+    print("DEBUG: place_order function called")
+    print(f"DEBUG: Request form data: {dict(request.form)}")
+    
     user = get_current_user()
+    print(f"DEBUG: Current user: {user.id if user else 'None'}")
     if not user:
         flash('Please login to place an order.', 'error')
         return redirect(url_for('login'))
     
     cart_data = get_cart()
+    print(f"DEBUG: Cart data: {cart_data}")
     if not cart_data:
         flash('Your cart is empty.', 'error')
         return redirect(url_for('cart'))
