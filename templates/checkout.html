@@ -555,6 +555,8 @@ class CheckoutManager {
         .then(html => {
             // Parse response to check for success/error
             if (html.includes('Order #') && html.includes('placed successfully')) {
+                // Clear the cart display immediately
+                this.clearCartDisplay();
                 this.showSuccessMessage('Order placed successfully!');
                 setTimeout(() => {
                     window.location.href = '/orders';
@@ -598,6 +600,27 @@ class CheckoutManager {
 
     showErrorMessage(message) {
         this.showNotification(message, 'danger');
+    }
+
+    clearCartDisplay() {
+        // Update cart count in navbar
+        const cartBadge = document.querySelector('.navbar .badge');
+        if (cartBadge) {
+            cartBadge.textContent = '0';
+            cartBadge.style.display = 'none';
+        }
+        
+        // Update cart total display
+        const cartTotalElements = document.querySelectorAll('.cart-total');
+        cartTotalElements.forEach(element => {
+            element.textContent = '$0.00';
+        });
+        
+        // Update cart count display
+        const cartCountElements = document.querySelectorAll('.cart-count');
+        cartCountElements.forEach(element => {
+            element.textContent = '0';
+        });
     }
 
     showNotification(message, type) {
