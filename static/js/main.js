@@ -45,15 +45,7 @@
                 this.autoDismissAlerts();
             });
 
-            // Handle dropdown toggles
-            document.addEventListener('click', (e) => {
-                if (e.target.matches('.dropdown-toggle')) {
-                    e.preventDefault();
-                    // Use Bootstrap's dropdown functionality
-                    const dropdown = new bootstrap.Dropdown(e.target);
-                    dropdown.toggle();
-                }
-            });
+
 
             // Handle tooltip initialization
             this.initializeTooltips();
