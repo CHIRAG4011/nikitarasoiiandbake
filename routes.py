@@ -194,6 +194,10 @@ def place_order():
     
     # Create order
     order_id = get_next_id('order_id')
+    print(f"DEBUG: Creating order with ID: {order_id}, User ID: {user.id}")
+    print(f"DEBUG: Order items: {order_items}")
+    print(f"DEBUG: Total: {total}")
+    
     order = Order(
         order_id=order_id,
         user_id=user.id,
@@ -204,12 +208,21 @@ def place_order():
     )
     
     data_store['orders'][order_id] = order
+    print(f"DEBUG: Order stored in data_store. Total orders now: {len(data_store['orders'])}")
+    print(f"DEBUG: Orders in store: {list(data_store['orders'].keys())}")
     
-    # Send confirmation email
-    send_order_confirmation_email(user.email, order)
+    # Send confirmation email (but catch any errors)
+    try:
+        send_order_confirmation_email(user.email, order)
+        print(f"DEBUG: Email sent successfully")
+    except Exception as e:
+        print(f"DEBUG: Email sending failed: {e}")
+        # Continue anyway, don't let email failure stop order placement
     
     # Clear cart
+    print(f"DEBUG: Cart before clearing: {session.get('cart', {})}")
     clear_cart()
+    print(f"DEBUG: Cart after clearing: {session.get('cart', {})}")
     
     flash(f'Order #{order_id} placed successfully! Confirmation email sent.', 'success')
     return redirect(url_for('order_tracking', order_id=order_id))
@@ -336,7 +349,13 @@ def user_orders():
         flash('Please login to view your orders.', 'error')
         return redirect(url_for('login'))
     
+    print(f"DEBUG: User {user.id} requesting orders")
+    print(f"DEBUG: Total orders in store: {len(data_store['orders'])}")
+    print(f"DEBUG: All orders: {list(data_store['orders'].keys())}")
+    
     user_orders_list = [order for order in data_store['orders'].values() if order.user_id == user.id]
+    print(f"DEBUG: Found {len(user_orders_list)} orders for user {user.id}")
+    
     user_orders_list.sort(key=lambda x: x.created_at, reverse=True)
     
     return render_template('user/orders.html', orders=user_orders_list)
