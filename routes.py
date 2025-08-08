@@ -1,7 +1,8 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import app
-from models import db, User, Product, Order, Review, Address, OrderItem, VisitorLog
+from models import User, Product, Order, Review, Address, OrderItem, VisitorLog
+from data_store import data_store, add_visitor_log, get_next_id, get_weekly_visitors
 from utils import (get_current_user, add_to_cart, remove_from_cart, update_cart_quantity, 
                   get_cart_total, get_cart_count, clear_cart, send_order_confirmation_email,
                   calculate_order_stats, search_products, get_cart)
@@ -13,15 +14,13 @@ def log_visitor():
     """Log visitor information"""
     if request.endpoint not in ['static']:
         try:
-            visitor_log = VisitorLog(
-                ip_address=request.remote_addr,
-                user_agent=request.headers.get('User-Agent', '')
+            add_visitor_log(
+                request.remote_addr,
+                request.headers.get('User-Agent', ''),
+                request.endpoint
             )
-            db.session.add(visitor_log)
-            db.session.commit()
         except Exception as e:
             # If visitor logging fails, don't break the app
-            db.session.rollback()
             logging.warning(f"Failed to log visitor: {e}")
 
 @app.context_processor
@@ -36,7 +35,8 @@ def inject_globals():
 @app.route('/')
 def index():
     """Home page"""
-    featured_products = Product.query.limit(6).all()
+    # Get first 6 products as featured
+    featured_products = list(data_store['products'].values())[:6]
     return render_template('index.html', featured_products=featured_products)
 
 @app.route('/products')
@@ -48,9 +48,9 @@ def products():
     if query or category != 'all':
         product_list = search_products(query, category)
     else:
-        product_list = Product.query.all()
+        product_list = list(data_store['products'].values())
     
-    categories = list(set(p.category for p in Product.query.all()))
+    categories = list(set(p.category for p in data_store['products'].values()))
     
     return render_template('products.html', 
                          products=product_list, 
@@ -61,9 +61,13 @@ def products():
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
     """Product detail page"""
-    product = Product.query.get_or_404(product_id)
+    product = data_store['products'].get(product_id)
+    if not product:
+        from flask import abort
+        abort(404)
+    
     # Get reviews for this product
-    product_reviews = Review.query.filter_by(product_id=product_id).all()
+    product_reviews = [r for r in data_store['reviews'].values() if r.product_id == product_id]
     
     return render_template('product_detail.html', product=product, reviews=product_reviews)
 
@@ -87,7 +91,7 @@ def cart():
     
     for product_id_str, item_data in cart_data.items():
         product_id = int(product_id_str)
-        product = Product.query.get(product_id)
+        product = data_store['products'].get(product_id)
         if product:
             cart_items.append({
                 'product': product,
@@ -228,19 +232,27 @@ def register():
             return render_template('auth/register.html')
         
         # Check if user exists
-        if User.query.filter((User.username == username) | (User.email == email)).first():
+        existing_user = None
+        for user_obj in data_store['users'].values():
+            if user_obj.username == username or user_obj.email == email:
+                existing_user = user_obj
+                break
+        
+        if existing_user:
             flash('Username or email already exists.', 'error')
             return render_template('auth/register.html')
         
         # Create user
+        from data_store import get_next_id
+        user_id = get_next_id('user_id')
         user = User(
+            user_id=user_id,
             username=username,
             email=email,
             password_hash=generate_password_hash(password or '')
         )
         
-        db.session.add(user)
-        db.session.commit()
+        data_store['users'][user_id] = user
         flash('Registration successful! Please login.', 'success')
         return redirect(url_for('login'))
     
@@ -254,7 +266,11 @@ def login():
         password = request.form.get('password')
         
         # Find user
-        user = User.query.filter((User.username == username) | (User.email == username)).first()
+        user = None
+        for user_obj in data_store['users'].values():
+            if user_obj.username == username or user_obj.email == username:
+                user = user_obj
+                break
         
         if user and user.check_password(password):
             session['user_id'] = user.id
@@ -284,7 +300,7 @@ def profile():
         return redirect(url_for('login'))
     
     # Get user addresses
-    user_addresses = Address.query.filter_by(user_id=user.id).all()
+    user_addresses = [addr for addr in data_store['addresses'].values() if addr.user_id == user.id]
     
     return render_template('user/profile.html', addresses=user_addresses)
 
@@ -295,7 +311,10 @@ def add_address():
     if not user:
         return redirect(url_for('login'))
     
+    from data_store import get_next_id
+    address_id = get_next_id('address_id')
     address = Address(
+        address_id=address_id,
         user_id=user.id,
         name=request.form.get('name'),
         street=request.form.get('street'),
@@ -304,8 +323,7 @@ def add_address():
         zip_code=request.form.get('zip_code')
     )
     
-    db.session.add(address)
-    db.session.commit()
+    data_store['addresses'][address_id] = address
     flash('Address added successfully!', 'success')
     return redirect(url_for('profile'))
 
@@ -317,7 +335,8 @@ def user_orders():
         flash('Please login to view your orders.', 'error')
         return redirect(url_for('login'))
     
-    user_orders_list = Order.query.filter_by(user_id=user.id).order_by(Order.created_at.desc()).all()
+    user_orders_list = [order for order in data_store['orders'].values() if order.user_id == user.id]
+    user_orders_list.sort(key=lambda x: x.created_at, reverse=True)
     
     return render_template('user/orders.html', orders=user_orders_list)
 
@@ -359,15 +378,17 @@ def add_review(product_id):
     rating = int(request.form.get('rating', '1'))
     comment = request.form.get('comment')
     
+    from data_store import get_next_id
+    review_id = get_next_id('review_id')
     review = Review(
+        review_id=review_id,
         product_id=product_id,
         user_id=user.id,
         rating=rating,
         comment=comment
     )
     
-    db.session.add(review)
-    db.session.commit()
+    data_store['reviews'][review_id] = review
     flash('Review added successfully!', 'success')
     return redirect(url_for('product_detail', product_id=product_id))
 
@@ -381,8 +402,11 @@ def admin_dashboard():
         return redirect(url_for('index'))
     
     stats = calculate_order_stats()
-    daily_visitors = VisitorLog.query.filter(VisitorLog.timestamp >= datetime.utcnow().date()).count()
-    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(10).all()
+    from data_store import get_daily_visitors
+    daily_visitors = get_daily_visitors()
+    recent_orders = list(data_store['orders'].values())
+    recent_orders.sort(key=lambda x: x.created_at, reverse=True)
+    recent_orders = recent_orders[:10]
     
     return render_template('admin/dashboard.html', 
                          stats=stats, 
@@ -397,7 +421,7 @@ def admin_products():
         flash('Access denied.', 'error')
         return redirect(url_for('index'))
     
-    products = Product.query.all()
+    products = list(data_store['products'].values())
     return render_template('admin/products.html', products=products)
 
 @app.route('/admin/add_product', methods=['POST'])
@@ -488,7 +512,7 @@ def admin_users():
         flash('Access denied.', 'error')
         return redirect(url_for('index'))
     
-    users = User.query.all()
+    users = list(data_store['users'].values())
     return render_template('admin/users.html', users=users)
 
 @app.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
@@ -499,7 +523,10 @@ def toggle_admin(user_id):
         flash('Access denied.', 'error')
         return redirect(url_for('index'))
     
-    target_user = User.query.get_or_404(user_id)
+    target_user = data_store['users'].get(user_id)
+    if not target_user:
+        from flask import abort
+        abort(404)
     
     # Prevent removing admin from yourself
     if target_user.id == current_user.id:
@@ -507,7 +534,7 @@ def toggle_admin(user_id):
         return redirect(url_for('admin_users'))
     
     target_user.is_admin = not target_user.is_admin
-    db.session.commit()
+    # No commit needed for in-memory storage
     
     action = 'granted' if target_user.is_admin else 'removed'
     flash(f'Admin privileges {action} for {target_user.username}.', 'success')

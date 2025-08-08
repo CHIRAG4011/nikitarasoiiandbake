@@ -121,9 +121,9 @@ def get_next_id(counter_name):
     data_store['counters'][counter_name] += 1
     return current_id
 
-def add_visitor_log(ip_address, user_agent):
+def add_visitor_log(ip_address, user_agent, page=None):
     """Add a visitor log entry"""
-    visitor_log = VisitorLog(ip_address, user_agent)
+    visitor_log = VisitorLog(ip_address, user_agent, page)
     data_store['visitor_logs'].append(visitor_log)
 
 def get_daily_visitors():
