@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Sweet Crumbs Bakery{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-brown mb-4">
+        <i class="fas fa-shopping-cart me-2"></i>Your Shopping Cart
+    </h2>
+    
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="row align-items-center border-bottom py-3">
+                        <div class="col-md-2">
+                            <img src="{{ item.product.image_url }}" 
+                                 alt="{{ item.product.name }}" 
+                                 class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <p class="text-muted small mb-0">{{ item.product.category }}</p>
+                            <p class="text-brown fw-bold">${{ "%.2f"|format(item.product.price) }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <form method="post" action="{{ url_for('update_cart') }}" class="d-flex align-items-center">
+                                <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                                <input type="number" name="quantity" value="{{ item.quantity }}" 
+                                       min="1" max="{{ item.product.stock }}" class="form-control form-control-sm me-2" 
+                                       style="width: 80px;" onchange="this.form.submit()">
+                                <span class="text-muted">/ {{ item.product.stock }}</span>
+                            </form>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <p class="fw-bold mb-1">${{ "%.2f"|format(item.total) }}</p>
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <a href="{{ url_for('remove_from_cart_route', product_id=item.product.id) }}" 
+                               class="btn btn-outline-danger btn-sm" 
+                               onclick="return confirm('Remove this item from cart?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-brown text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>${{ "%.2f"|format(cart_total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Delivery Fee:</span>
+                        <span>$5.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-brown">${{ "%.2f"|format(cart_total + 5.00) }}</strong>
+                    </div>
+                    
+                    {% if current_user %}
+                    <a href="{{ url_for('checkout') }}" class="btn btn-brown w-100 mb-2">
+                        <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('login') }}?next={{ url_for('checkout') }}" class="btn btn-brown w-100 mb-2">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Checkout
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('products') }}" class="btn btn-outline-brown w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Delivery Info -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-truck me-2"></i>Delivery Information</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-check text-success me-2"></i>Same-day delivery available</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Orders before 2 PM qualify</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Free delivery on orders over $50</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">Your cart is empty</h3>
+        <p class="text-muted mb-4">Looks like you haven't added any delicious treats to your cart yet.</p>
+        <a href="{{ url_for('products') }}" class="btn btn-brown btn-lg">
+            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Auto-submit quantity changes with a small delay
+document.querySelectorAll('input[name="quantity"]').forEach(function(input) {
+    let timeout;
+    input.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            input.form.submit();
+        }, 1000); // 1 second delay
+    });
+});
+</script>
+{% endblock %}

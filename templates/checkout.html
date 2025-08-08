@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Sweet Crumbs Bakery{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-brown mb-4">
+        <i class="fas fa-credit-card me-2"></i>Checkout
+    </h2>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post" action="{{ url_for('place_order') }}">
+                <!-- Shipping Address -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Delivery Address</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if addresses %}
+                        <div class="mb-3">
+                            <label class="form-label">Select Saved Address:</label>
+                            {% for address in addresses %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="address_id" 
+                                       value="{{ address.id }}" id="address{{ address.id }}">
+                                <label class="form-check-label" for="address{{ address.id }}">
+                                    <strong>{{ address.name }}</strong><br>
+                                    {{ address.street }}<br>
+                                    {{ address.city }}, {{ address.state }} {{ address.zip_code }}<br>
+                                    <small class="text-muted">{{ address.phone }}</small>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="address_type" 
+                                   value="new" id="newAddress" onclick="toggleNewAddress()">
+                            <label class="form-check-label" for="newAddress">
+                                Use a different address
+                            </label>
+                        </div>
+                        {% endif %}
+                        
+                        <div id="newAddressForm" {% if addresses %}style="display:none;"{% endif %}>
+                            <div class="mb-3">
+                                <label for="new_address" class="form-label">Full Address</label>
+                                <textarea class="form-control" id="new_address" name="new_address" rows="3"
+                                          placeholder="Enter your complete delivery address"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Information -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            This is a demo checkout. No actual payment will be processed.
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="cardName" class="form-label">Cardholder Name</label>
+                                <input type="text" class="form-control" id="cardName" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cardNumber" class="form-label">Card Number</label>
+                                <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="expiry" class="form-label">Expiry Date</label>
+                                <input type="text" class="form-control" id="expiry" placeholder="MM/YY" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="paymentMethod" class="form-label">Payment Method</label>
+                                <select class="form-select" id="paymentMethod">
+                                    <option>Credit Card</option>
+                                    <option>Debit Card</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Special Instructions -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-comment me-2"></i>Special Instructions</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" rows="3" placeholder="Any special delivery instructions or notes..."></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-brown btn-lg">
+                    <i class="fas fa-shopping-bag me-2"></i>Place Order
+                </button>
+            </form>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Order Summary -->
+            <div class="card">
+                <div class="card-header bg-brown text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Items ({{ cart_count }}):</span>
+                        <span>${{ "%.2f"|format(cart_total) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Delivery Fee:</span>
+                        <span>$5.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (8.5%):</span>
+                        <span>${{ "%.2f"|format((cart_total + 5.00) * 0.085) }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <strong>Total:</strong>
+                        <strong class="text-brown">${{ "%.2f"|format((cart_total + 5.00) * 1.085) }}</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Notice -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-shield-alt me-2"></i>Secure Checkout</h6>
+                    <ul class="list-unstyled small">
+                        <li><i class="fas fa-check text-success me-2"></i>SSL encrypted</li>
+                        <li><i class="fas fa-check text-success me-2"></i>PCI compliant</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Money-back guarantee</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleNewAddress() {
+    const newAddressForm = document.getElementById('newAddressForm');
+    const newAddressRadio = document.getElementById('newAddress');
+    
+    if (newAddressRadio.checked) {
+        newAddressForm.style.display = 'block';
+        // Uncheck address selection
+        document.querySelectorAll('input[name="address_id"]').forEach(radio => {
+            radio.checked = false;
+        });
+    } else {
+        newAddressForm.style.display = 'none';
+    }
+}
+
+// Format card number input
+document.getElementById('cardNumber').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    let formattedValue = value.match(/\d{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
+// Format expiry date
+document.getElementById('expiry').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    e.target.value = value;
+});
+
+// CVV validation
+document.getElementById('cvv').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Sweet Crumbs Bakery{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-brown">
+            <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+        </h2>
+        <span class="text-muted">Welcome back, {{ current_user.username }}!</span>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h2 class="mb-0">{{ stats.total_orders }}</h2>
+                            <p class="mb-0">Total Orders</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-shopping-bag fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h2 class="mb-0">${{ "%.0f"|format(stats.total_revenue) }}</h2>
+                            <p class="mb-0">Total Revenue</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h2 class="mb-0">{{ stats.pending_orders }}</h2>
+                            <p class="mb-0">Pending Orders</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h2 class="mb-0">{{ daily_visitors }}</h2>
+                            <p class="mb-0">Today's Visitors</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Recent Orders</h5>
+                    <a href="{{ url_for('admin_orders') }}" class="btn btn-brown btn-sm">
+                        <i class="fas fa-eye me-1"></i>View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('order_tracking', order_id=order.id) }}" class="text-decoration-none">
+                                            #{{ order.id }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% for user in data_store.users.values() if user.id == order.user_id %}
+                                        {{ user.username }}
+                                        {% endfor %}
+                                    </td>
+                                    <td>${{ "%.2f"|format(order.total) }}</td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                        <span class="badge bg-warning">{{ order.status.title() }}</span>
+                                        {% elif order.status == 'confirmed' %}
+                                        <span class="badge bg-info">{{ order.status.title() }}</span>
+                                        {% elif order.status == 'preparing' %}
+                                        <span class="badge bg-primary">{{ order.status.title() }}</span>
+                                        {% elif order.status == 'delivered' %}
+                                        <span class="badge bg-success">{{ order.status.title() }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ order.created_at.strftime('%m/%d/%Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3">
+                        <p class="text-muted">No orders yet</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('admin_products') }}" class="btn btn-outline-brown">
+                            <i class="fas fa-boxes me-2"></i>Manage Products
+                        </a>
+                        <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-brown">
+                            <i class="fas fa-shopping-bag me-2"></i>Manage Orders
+                        </a>
+                        <a href="{{ url_for('admin_analytics') }}" class="btn btn-outline-brown">
+                            <i class="fas fa-chart-bar me-2"></i>View Analytics
+                        </a>
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-external-link-alt me-2"></i>View Store
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Status -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-server me-2"></i>System Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Products:</span>
+                        <span class="fw-bold">{{ data_store.products|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Users:</span>
+                        <span class="fw-bold">{{ data_store.users|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Total Reviews:</span>
+                        <span class="fw-bold">{{ data_store.reviews|length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js for potential future charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}

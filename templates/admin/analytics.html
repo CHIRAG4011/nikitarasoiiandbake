@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Sweet Crumbs Bakery{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-brown">
+            <i class="fas fa-chart-bar me-2"></i>Analytics Dashboard
+        </h2>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-brown">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h3 class="mb-0">{{ stats.total_orders }}</h3>
+                            <p class="mb-0">Total Orders</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-shopping-bag fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h3 class="mb-0">${{ "%.0f"|format(stats.total_revenue) }}</h3>
+                            <p class="mb-0">Total Revenue</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h3 class="mb-0">{{ stats.pending_orders }}</h3>
+                            <p class="mb-0">Pending Orders</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-clock fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-gradient-info text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h3 class="mb-0">{{ stats.completed_orders }}</h3>
+                            <p class="mb-0">Completed Orders</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Visitor Analytics -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Weekly Visitor Analytics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="visitorsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Status Breakdown -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pie-chart me-2"></i>Order Status Distribution
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Product Performance -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Top Performing Products
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Stock</th>
+                                    <th>Reviews</th>
+                                    <th>Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in data_store.products.values()[:10] %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ product.image_url }}" alt="{{ product.name }}" 
+                                                 style="width: 30px; height: 30px; object-fit: cover;" class="rounded me-2">
+                                            {{ product.name[:25] }}{% if product.name|length > 25 %}...{% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if product.stock < 5 %}
+                                        <span class="badge bg-danger">{{ product.stock }}</span>
+                                        {% elif product.stock < 10 %}
+                                        <span class="badge bg-warning">{{ product.stock }}</span>
+                                        {% else %}
+                                        <span class="badge bg-success">{{ product.stock }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ product.reviews|length }}</td>
+                                    <td>
+                                        {% if product.get_average_rating() > 0 %}
+                                        <div class="text-warning">
+                                            {% for i in range(5) %}
+                                                {% if i < product.get_average_rating() %}
+                                                <i class="fas fa-star"></i>
+                                                {% else %}
+                                                <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <small>({{ "%.1f"|format(product.get_average_rating()) }})</small>
+                                        </div>
+                                        {% else %}
+                                        <small class="text-muted">No ratings</small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-activity me-2"></i>Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for order in data_store.orders.values()[:8] %}
+                        <div class="timeline-item mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0">
+                                    {% if order.status == 'pending' %}
+                                    <i class="fas fa-clock text-warning"></i>
+                                    {% elif order.status == 'confirmed' %}
+                                    <i class="fas fa-check text-info"></i>
+                                    {% elif order.status == 'preparing' %}
+                                    <i class="fas fa-utensils text-primary"></i>
+                                    {% elif order.status == 'delivered' %}
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Order #{{ order.id }}</h6>
+                                    <p class="text-muted mb-1">
+                                        {% for user in data_store.users.values() if user.id == order.user_id %}
+                                        {{ user.username }}
+                                        {% endfor %}
+                                        placed an order for ${{ "%.2f"|format(order.total) }}
+                                    </p>
+                                    <small class="text-muted">{{ order.created_at.strftime('%m/%d/%Y %I:%M %p') }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Information -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>System Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-brown">{{ data_store.products|length }}</h4>
+                                <p class="text-muted">Total Products</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-brown">{{ data_store.users|length }}</h4>
+                                <p class="text-muted">Registered Users</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-brown">{{ data_store.reviews|length }}</h4>
+                                <p class="text-muted">Customer Reviews</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-brown">{{ data_store.addresses|length }}</h4>
+                                <p class="text-muted">Saved Addresses</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Weekly Visitors Chart
+const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
+const weeklyVisitors = {{ weekly_visitors|tojson }};
+
+new Chart(visitorsCtx, {
+    type: 'line',
+    data: {
+        labels: Object.keys(weeklyVisitors),
+        datasets: [{
+            label: 'Daily Visitors',
+            data: Object.values(weeklyVisitors),
+            borderColor: '#8B4513',
+            backgroundColor: 'rgba(139, 69, 19, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Order Status Distribution Chart
+const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+const orders = {{ data_store.orders.values()|list|tojson }};
+
+// Calculate status distribution
+const statusCounts = {};
+orders.forEach(order => {
+    statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
+});
+
+new Chart(orderStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(statusCounts).map(status => 
+            status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')
+        ),
+        datasets: [{
+            data: Object.values(statusCounts),
+            backgroundColor: [
+                '#ffc107', // warning (pending)
+                '#17a2b8', // info (confirmed)
+                '#007bff', // primary (preparing)
+                '#fd7e14', // warning (out for delivery)
+                '#28a745', // success (delivered)
+                '#dc3545'  // danger (cancelled)
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

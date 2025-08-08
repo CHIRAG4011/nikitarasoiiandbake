@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} - Sweet Crumbs Bakery{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-brown mb-0">Order #{{ order.id }}</h2>
+        <a href="{{ url_for('user_orders') }}" class="btn btn-outline-brown">
+            <i class="fas fa-arrow-left me-2"></i>Back to Orders
+        </a>
+    </div>
+    
+    <!-- Order Status -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Order Status</h5>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4>
+                        {% if order.status == 'pending' %}
+                        <span class="badge bg-warning fs-6">Pending Confirmation</span>
+                        {% elif order.status == 'confirmed' %}
+                        <span class="badge bg-info fs-6">Confirmed</span>
+                        {% elif order.status == 'preparing' %}
+                        <span class="badge bg-primary fs-6">Being Prepared</span>
+                        {% elif order.status == 'out_for_delivery' %}
+                        <span class="badge bg-warning fs-6">Out for Delivery</span>
+                        {% elif order.status == 'delivered' %}
+                        <span class="badge bg-success fs-6">Delivered</span>
+                        {% elif order.status == 'cancelled' %}
+                        <span class="badge bg-danger fs-6">Cancelled</span>
+                        {% endif %}
+                    </h4>
+                    <p class="text-muted">Last updated: {{ order.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                </div>
+                <div class="col-md-6">
+                    <!-- Order Progress -->
+                    <div class="progress" style="height: 25px;">
+                        {% if order.status == 'pending' %}
+                        <div class="progress-bar bg-warning" style="width: 20%">20%</div>
+                        {% elif order.status == 'confirmed' %}
+                        <div class="progress-bar bg-info" style="width: 40%">40%</div>
+                        {% elif order.status == 'preparing' %}
+                        <div class="progress-bar bg-primary" style="width: 60%">60%</div>
+                        {% elif order.status == 'out_for_delivery' %}
+                        <div class="progress-bar bg-warning" style="width: 80%">80%</div>
+                        {% elif order.status == 'delivered' %}
+                        <div class="progress-bar bg-success" style="width: 100%">100%</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Order Items -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>Order Items</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in order_items %}
+                    <div class="row align-items-center border-bottom py-3">
+                        <div class="col-md-2">
+                            <img src="{{ item.product.image_url }}" 
+                                 alt="{{ item.product.name }}" 
+                                 class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <p class="text-muted small mb-0">{{ item.product.category }}</p>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <span class="fw-bold">Qty: {{ item.quantity }}</span>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <p class="fw-bold mb-0">${{ "%.2f"|format(item.total) }}</p>
+                            <small class="text-muted">${{ "%.2f"|format(item.price) }} each</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-receipt me-2"></i>Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Order Date:</strong><br>{{ order.created_at.strftime('%B %d, %Y') }}</p>
+                    <p><strong>Total Amount:</strong><br><span class="h4 text-brown">${{ "%.2f"|format(order.total) }}</span></p>
+                    
+                    <hr>
+                    
+                    <h6><i class="fas fa-map-marker-alt me-2"></i>Delivery Address:</h6>
+                    <p class="text-muted">{{ order.shipping_address }}</p>
+                    
+                    {% if order.status == 'delivered' %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Order delivered successfully!
+                    </div>
+                    {% elif order.status == 'out_for_delivery' %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-truck me-2"></i>
+                        Your order is on the way!
+                    </div>
+                    {% elif order.status == 'preparing' %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-utensils me-2"></i>
+                        Your delicious treats are being prepared!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Customer Support -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-headset me-2"></i>Need Help?</h6>
+                    <p class="card-text small">
+                        Contact our customer support team if you have any questions about your order.
+                    </p>
+                    <p class="small mb-0">
+                        <i class="fas fa-phone me-2"></i>(555) 123-CAKE<br>
+                        <i class="fas fa-envelope me-2"></i>support@sweetcrumbsbakery.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

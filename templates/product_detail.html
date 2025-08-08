@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Sweet Crumbs Bakery{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <img src="{{ product.image_url }}" class="img-fluid rounded shadow" alt="{{ product.name }}">
+        </div>
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('products') }}">Products</a></li>
+                    <li class="breadcrumb-item active">{{ product.name }}</li>
+                </ol>
+            </nav>
+            
+            <h1 class="text-brown mb-3">{{ product.name }}</h1>
+            
+            <!-- Rating Display -->
+            <div class="mb-3">
+                {% set avg_rating = product.get_average_rating() %}
+                {% if avg_rating > 0 %}
+                <div class="text-warning">
+                    {% for i in range(5) %}
+                        {% if i < avg_rating %}
+                        <i class="fas fa-star"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <span class="text-dark ms-2">{{ "%.1f"|format(avg_rating) }} ({{ reviews|length }} reviews)</span>
+                </div>
+                {% else %}
+                <small class="text-muted">No reviews yet - be the first to review!</small>
+                {% endif %}
+            </div>
+            
+            <p class="lead mb-4">{{ product.description }}</p>
+            
+            <div class="mb-3">
+                <span class="badge bg-secondary fs-6">{{ product.category }}</span>
+            </div>
+            
+            <div class="mb-4">
+                <h3 class="text-brown">${{ "%.2f"|format(product.price) }}</h3>
+            </div>
+            
+            <!-- Stock Status -->
+            <div class="mb-4">
+                {% if product.stock > 10 %}
+                <span class="text-success"><i class="fas fa-check-circle me-2"></i>In Stock ({{ product.stock }} available)</span>
+                {% elif product.stock > 0 %}
+                <span class="text-warning"><i class="fas fa-exclamation-circle me-2"></i>Low Stock ({{ product.stock }} remaining)</span>
+                {% else %}
+                <span class="text-danger"><i class="fas fa-times-circle me-2"></i>Out of Stock</span>
+                {% endif %}
+            </div>
+            
+            <!-- Add to Cart Form -->
+            {% if product.stock > 0 %}
+            <form method="post" action="{{ url_for('add_to_cart_route', product_id=product.id) }}" class="mb-4">
+                <div class="row align-items-end">
+                    <div class="col-md-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <select class="form-select" id="quantity" name="quantity">
+                            {% for i in range(1, [product.stock + 1, 11]|min) %}
+                            <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-9">
+                        <button type="submit" class="btn btn-brown btn-lg">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+            {% else %}
+            <button class="btn btn-secondary btn-lg mb-4" disabled>
+                <i class="fas fa-ban me-2"></i>Out of Stock
+            </button>
+            {% endif %}
+            
+            <div class="row text-center">
+                <div class="col-4">
+                    <i class="fas fa-truck text-brown fa-2x mb-2"></i>
+                    <p class="small">Fast Delivery</p>
+                </div>
+                <div class="col-4">
+                    <i class="fas fa-shield-alt text-brown fa-2x mb-2"></i>
+                    <p class="small">Quality Guarantee</p>
+                </div>
+                <div class="col-4">
+                    <i class="fas fa-leaf text-brown fa-2x mb-2"></i>
+                    <p class="small">Fresh Ingredients</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reviews Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-brown mb-4">Customer Reviews</h3>
+            
+            <!-- Add Review Form -->
+            {% if current_user %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Add Your Review</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ url_for('add_review', product_id=product.id) }}">
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Rating</label>
+                            <select class="form-select" id="rating" name="rating" required>
+                                <option value="">Select Rating</option>
+                                <option value="5">5 Stars - Excellent</option>
+                                <option value="4">4 Stars - Very Good</option>
+                                <option value="3">3 Stars - Good</option>
+                                <option value="2">2 Stars - Fair</option>
+                                <option value="1">1 Star - Poor</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comment</label>
+                            <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-brown">
+                            <i class="fas fa-star me-2"></i>Submit Review
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <a href="{{ url_for('login') }}">Login</a> to add a review for this product.
+            </div>
+            {% endif %}
+            
+            <!-- Reviews List -->
+            {% if reviews %}
+            <div class="reviews-list">
+                {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="mb-1">
+                                    {% for user in data_store.users.values() if user.id == review.user_id %}
+                                    {{ user.username }}
+                                    {% endfor %}
+                                </h6>
+                                <div class="text-warning">
+                                    {% for i in range(5) %}
+                                        {% if i < review.rating %}
+                                        <i class="fas fa-star"></i>
+                                        {% else %}
+                                        <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <small class="text-muted">{{ review.created_at.strftime('%B %d, %Y') }}</small>
+                        </div>
+                        <p class="mb-0">{{ review.comment }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No reviews yet</h5>
+                <p class="text-muted">Be the first to review this product!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
