@@ -143,7 +143,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
 
-            const container = document.querySelector('.container').first() || document.body;
+            const container = document.querySelector('.container') || document.body;
             container.insertBefore(alertDiv, container.firstChild);
 
             if (!permanent) {
@@ -301,9 +301,12 @@
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const target = document.querySelector(anchor.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
+                    const href = anchor.getAttribute('href');
+                    if (href && href !== '#') {
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
                     }
                 });
             });

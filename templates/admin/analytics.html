@@ -137,7 +137,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for product in data_store.products.values()|list|slice(10) %}
+                                {% for product in data_store.products.values()|list[:10] %}
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">

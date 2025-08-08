@@ -78,13 +78,13 @@
                             <td>
                                 <small>
                                     {% for item in order.items %}
-                                    {% set product = data_store.products[item.product_id] %}
-                                    {{ item.quantity }}x {{ product.name[:20] }}{% if not loop.last %},<br>{% endif %}
+                                    {% set product = data_store.products.get(item.product_id) if item.product_id else none %}
+                                    {{ item.quantity }}x {{ product.name[:20] if product else "Unknown Product" }}{% if not loop.last %},<br>{% endif %}
                                     {% endfor %}
                                 </small>
                             </td>
                             <td>
-                                <strong class="text-brown">${{ "%.2f"|format(order.total) }}</strong>
+                                <strong class="text-brown">₹{{ "%.2f"|format(order.total) }}</strong>
                             </td>
                             <td>
                                 {% if order.status == 'pending' %}
