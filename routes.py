@@ -95,8 +95,8 @@ def cart():
 @app.route('/update_cart', methods=['POST'])
 def update_cart():
     """Update cart quantities"""
-    product_id = int(request.form.get('product_id'))
-    quantity = int(request.form.get('quantity'))
+    product_id = int(request.form.get('product_id', '0'))
+    quantity = int(request.form.get('quantity', '1'))
     
     if update_cart_quantity(product_id, quantity):
         flash('Cart updated!', 'success')
@@ -234,7 +234,7 @@ def register():
             user_id=user_id,
             username=username,
             email=email,
-            password_hash=generate_password_hash(password)
+            password_hash=generate_password_hash(password or '')
         )
         
         data_store['users'][user_id] = user
@@ -362,7 +362,7 @@ def add_review(product_id):
         flash('Please login to add a review.', 'error')
         return redirect(url_for('login'))
     
-    rating = int(request.form.get('rating'))
+    rating = int(request.form.get('rating', '1'))
     comment = request.form.get('comment')
     
     review_id = get_next_id('review_id')
@@ -419,10 +419,10 @@ def admin_add_product():
         product_id=product_id,
         name=request.form.get('name'),
         description=request.form.get('description'),
-        price=float(request.form.get('price')),
+        price=float(request.form.get('price', '0')),
         category=request.form.get('category'),
         image_url=request.form.get('image_url'),
-        stock=int(request.form.get('stock'))
+        stock=int(request.form.get('stock', '0'))
     )
     
     data_store['products'][product_id] = product
@@ -438,7 +438,7 @@ def admin_update_stock(product_id):
     
     product = data_store['products'].get(product_id)
     if product:
-        product.stock = int(request.form.get('stock'))
+        product.stock = int(request.form.get('stock', '0'))
         flash('Stock updated successfully!', 'success')
     
     return redirect(url_for('admin_products'))

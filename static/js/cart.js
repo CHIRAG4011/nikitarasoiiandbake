@@ -50,8 +50,10 @@ class CartManager {
     }
 
     handleAddToCart(button) {
-        const productId = button.getAttribute('data-product-id');
-        const quantityInput = button.closest('form')?.querySelector('select[name="quantity"]');
+        const productId = button.getAttribute('data-product-id') || 
+                         button.closest('form')?.action?.split('/').pop();
+        const form = button.closest('form');
+        const quantityInput = form?.querySelector('select[name="quantity"], input[name="quantity"]');
         const quantity = quantityInput ? quantityInput.value : 1;
 
         // Show loading state
@@ -71,10 +73,15 @@ class CartManager {
             }
             throw new Error('Failed to add item to cart');
         })
-        .then(() => {
-            this.showCartNotification('Item added to cart!', 'success');
-            this.updateCartDisplay();
-            this.animateAddToCart(button);
+        .then(html => {
+            // Check if response contains success message
+            if (html.includes('added to cart') || html.includes('success')) {
+                this.showCartNotification('Item added to cart!', 'success');
+                this.updateCartDisplay();
+                this.animateAddToCart(button);
+            } else {
+                this.showCartNotification('Unable to add item to cart', 'error');
+            }
         })
         .catch(error => {
             console.error('Error:', error);

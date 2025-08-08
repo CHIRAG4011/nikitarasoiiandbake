@@ -379,6 +379,208 @@ footer h5 {
     background: var(--brown-secondary);
 }
 
+/* QR Code Modal Styles */
+.qr-code-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.qr-code {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 2px dashed var(--brown-primary);
+}
+
+.qr-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer-display {
+    display: flex;
+    align-items: center;
+}
+
+.screenshot-preview img {
+    max-width: 100%;
+    border: 2px solid var(--brown-primary);
+}
+
+/* Payment Methods Styling */
+.payment-methods .form-check {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.payment-methods .form-check:hover {
+    border-color: var(--brown-primary);
+    background-color: rgba(139, 69, 19, 0.05);
+}
+
+.payment-methods .form-check-input:checked + .form-check-label {
+    color: var(--brown-primary);
+    font-weight: 600;
+}
+
+.payment-methods .form-check:has(.form-check-input:checked) {
+    border-color: var(--brown-primary);
+    background-color: rgba(139, 69, 19, 0.1);
+}
+
+.payment-details {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+/* Enhanced Notifications */
+.notification-overlay {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+.notification-overlay .alert {
+    pointer-events: auto;
+    margin-bottom: 10px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading States */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Enhanced Cart Styles */
+.cart-item-enhanced {
+    transition: all 0.3s ease;
+}
+
+.cart-item-enhanced:hover {
+    background-color: rgba(139, 69, 19, 0.05);
+}
+
+.cart-item-removing {
+    opacity: 0.5;
+    transform: scale(0.95);
+    transition: all 0.3s ease;
+}
+
+/* Product Card Enhancements */
+.product-card-enhanced {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-card-enhanced .add-to-cart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(139, 69, 19, 0.9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.product-card-enhanced.adding-to-cart .add-to-cart-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Enhanced Modal Styles */
+.modal-lg {
+    max-width: 600px;
+}
+
+.modal-header {
+    border-bottom: 2px solid var(--brown-primary);
+}
+
+.modal-footer {
+    border-top: 2px solid #e9ecef;
+}
+
+/* Progress Indicators */
+.progress-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.progress-step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--brown-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.progress-step-content {
+    flex-grow: 1;
+}
+
+.progress-step.completed .progress-step-icon {
+    background: #28a745;
+}
+
+.progress-step.active .progress-step-icon {
+    background: #ffc107;
+    color: #333;
+}
+
 /* Utility Classes */
 .text-shadow {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -399,4 +601,21 @@ footer h5 {
 .hover-lift:hover {
     transform: translateY(-2px);
     transition: transform 0.3s ease;
+}
+
+/* Pulse Animation for Important Elements */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(139, 69, 19, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(139, 69, 19, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(139, 69, 19, 0);
+    }
 }
