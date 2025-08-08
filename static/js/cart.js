@@ -179,10 +179,10 @@ class CartManager {
         
         if (quantityInput && priceElement && totalElement) {
             const quantity = parseInt(quantityInput.value);
-            const price = parseFloat(priceElement.textContent.replace('$', ''));
+            const price = parseFloat(priceElement.textContent.replace('₹', ''));
             const total = quantity * price;
             
-            totalElement.textContent = `$${total.toFixed(2)}`;
+            totalElement.textContent = `₹${total.toFixed(2)}`;
         }
     }
 
@@ -218,12 +218,12 @@ class CartManager {
         // Calculate total from visible items
         let total = 0;
         document.querySelectorAll('.item-total').forEach(element => {
-            const value = parseFloat(element.textContent.replace('$', ''));
+            const value = parseFloat(element.textContent.replace('₹', ''));
             total += value;
         });
 
         cartTotalElements.forEach(element => {
-            element.textContent = `$${total.toFixed(2)}`;
+            element.textContent = `₹${total.toFixed(2)}`;
         });
     }
 

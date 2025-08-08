@@ -79,8 +79,8 @@
                             <span class="fw-bold">Qty: {{ item.quantity }}</span>
                         </div>
                         <div class="col-md-2 text-end">
-                            <p class="fw-bold mb-0">${{ "%.2f"|format(item.total) }}</p>
-                            <small class="text-muted">${{ "%.2f"|format(item.price) }} each</small>
+                            <p class="fw-bold mb-0">₹{{ "%.2f"|format(item.total) }}</p>
+                            <small class="text-muted">₹{{ "%.2f"|format(item.price) }} each</small>
                         </div>
                     </div>
                     {% endfor %}
@@ -96,7 +96,7 @@
                 </div>
                 <div class="card-body">
                     <p><strong>Order Date:</strong><br>{{ order.created_at.strftime('%B %d, %Y') }}</p>
-                    <p><strong>Total Amount:</strong><br><span class="h4 text-brown">${{ "%.2f"|format(order.total) }}</span></p>
+                    <p><strong>Total Amount:</strong><br><span class="h4 text-brown">₹{{ "%.2f"|format(order.total) }}</span></p>
                     
                     <hr>
                     

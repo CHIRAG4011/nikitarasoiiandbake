@@ -196,15 +196,15 @@
                             <tr>
                                 <td>{{ product.name }}</td>
                                 <td>{{ item.quantity }}</td>
-                                <td>${{ "%.2f"|format(item.price) }}</td>
-                                <td>${{ "%.2f"|format(item.quantity * item.price) }}</td>
+                                <td>₹{{ "%.2f"|format(item.price) }}</td>
+                                <td>₹{{ "%.2f"|format(item.quantity * item.price) }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                         <tfoot>
                             <tr class="table-active">
                                 <th colspan="3">Total</th>
-                                <th>${{ "%.2f"|format(order.total) }}</th>
+                                <th>₹{{ "%.2f"|format(order.total) }}</th>
                             </tr>
                         </tfoot>
                     </table>
