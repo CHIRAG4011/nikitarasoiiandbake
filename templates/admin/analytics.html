@@ -137,7 +137,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for product in data_store.products.values()|list[:10] %}
+                                {% for product in data_store.products.values() %}
+                                {% if loop.index <= 10 %}
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
@@ -173,6 +174,7 @@
                                         {% endif %}
                                     </td>
                                 </tr>
+                                {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -191,7 +193,8 @@
                 </div>
                 <div class="card-body">
                     <div class="timeline">
-                        {% for order in data_store.orders.values()[:8] %}
+                        {% for order in data_store.orders.values() %}
+                        {% if loop.index <= 8 %}
                         <div class="timeline-item mb-3">
                             <div class="d-flex">
                                 <div class="flex-shrink-0">
@@ -211,12 +214,13 @@
                                         {% for user in data_store.users.values() if user.id == order.user_id %}
                                         {{ user.username }}
                                         {% endfor %}
-                                        placed an order for ${{ "%.2f"|format(order.total) }}
+                                        placed an order for ₹{{ "%.2f"|format(order.total) }}
                                     </p>
                                     <small class="text-muted">{{ order.created_at.strftime('%m/%d/%Y %I:%M %p') }}</small>
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
                 </div>
