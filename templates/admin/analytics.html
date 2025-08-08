@@ -312,7 +312,16 @@ new Chart(visitorsCtx, {
 
 // Order Status Distribution Chart
 const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
-const orders = {{ data_store.orders.values()|list|tojson }};
+const orders = [
+        {% for order in data_store.orders.values() %}
+        {
+            id: {{ order.id }},
+            total: {{ order.total }},
+            status: "{{ order.status }}",
+            created_at: "{{ order.created_at.strftime('%Y-%m-%d') }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
 
 // Calculate status distribution
 const statusCounts = {};
