@@ -43,11 +43,13 @@
                         </div>
                         {% endif %}
                         
-                        <div id="newAddressForm" {% if addresses %}style="display:none;"{% endif %}>
+                        <div id="newAddressForm" {% if not addresses %}{% else %}style="display:none;"{% endif %}>
                             <div class="mb-3">
                                 <label for="new_address" class="form-label">Full Address <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="new_address" name="new_address" rows="3"
-                                          placeholder="Enter your complete delivery address" required></textarea>
+                                          placeholder="Enter your complete delivery address including name, street, city, state, and PIN code" 
+                                          {% if not addresses %}required{% endif %}></textarea>
+                                <div class="form-text">Please provide your complete delivery address including all necessary details.</div>
                             </div>
                         </div>
                     </div>
@@ -378,6 +380,11 @@ class CheckoutManager {
     }
 
     handleOrderSubmission() {
+        // Validate address first
+        if (!this.validateAddress()) {
+            return;
+        }
+        
         const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
         const digitalMethods = ['paypal', 'apple_pay', 'google_pay', 'crypto', 'bank_transfer'];
         
@@ -386,6 +393,42 @@ class CheckoutManager {
         } else {
             this.submitOrder();
         }
+    }
+
+    validateAddress() {
+        const addressRadios = document.querySelectorAll('input[name="address_id"]');
+        const newAddressField = document.getElementById('new_address');
+        
+        let hasSelectedAddress = false;
+        
+        // Check if any saved address is selected
+        addressRadios.forEach(radio => {
+            if (radio.checked) {
+                hasSelectedAddress = true;
+            }
+        });
+        
+        // Check if new address is provided when "Use different address" is selected
+        const useNewAddress = document.getElementById('newAddress');
+        if (useNewAddress && useNewAddress.checked) {
+            if (!newAddressField.value.trim()) {
+                alert('Please enter a delivery address.');
+                newAddressField.focus();
+                return false;
+            }
+            hasSelectedAddress = true;
+        }
+        
+        // If no addresses exist and new address field is empty
+        if (!hasSelectedAddress && (!newAddressField.value || !newAddressField.value.trim())) {
+            alert('Please provide a delivery address to continue.');
+            if (newAddressField) {
+                newAddressField.focus();
+            }
+            return false;
+        }
+        
+        return true;
     }
 
     showQRVerification(paymentMethod) {

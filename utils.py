@@ -82,11 +82,8 @@ def get_cart_count():
 
 def clear_cart():
     """Clear the cart"""
-    print(f"DEBUG: Clearing cart. Cart before: {session.get('cart', {})}")
     session['cart'] = {}
     session.modified = True
-    print(f"DEBUG: Cart cleared. Cart after: {session.get('cart', {})}")
-    print(f"DEBUG: Session modified flag: {session.modified}")
 
 def send_order_confirmation_email(user_email, order):
     """Send order confirmation email"""

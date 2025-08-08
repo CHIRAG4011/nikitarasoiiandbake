@@ -147,17 +147,12 @@ def checkout():
 @app.route('/place_order', methods=['POST'])
 def place_order():
     """Place an order"""
-    print("DEBUG: place_order function called")
-    print(f"DEBUG: Request form data: {dict(request.form)}")
-    
     user = get_current_user()
-    print(f"DEBUG: Current user: {user.id if user else 'None'}")
     if not user:
         flash('Please login to place an order.', 'error')
         return redirect(url_for('login'))
     
     cart_data = get_cart()
-    print(f"DEBUG: Cart data: {cart_data}")
     if not cart_data:
         flash('Your cart is empty.', 'error')
         return redirect(url_for('cart'))
@@ -165,9 +160,6 @@ def place_order():
     # Get shipping address
     address_id = request.form.get('address_id')
     new_address = request.form.get('new_address')
-    
-    print(f"DEBUG: Address ID: {address_id}")
-    print(f"DEBUG: New address: {new_address}")
     
     if address_id:
         address = data_store['addresses'].get(int(address_id))
@@ -179,9 +171,8 @@ def place_order():
     elif new_address and new_address.strip():
         shipping_address = new_address.strip()
     else:
-        # For testing purposes, allow orders without address temporarily
-        shipping_address = "Default Address - Testing Mode"
-        print("DEBUG: Using default address for testing")
+        flash('Please provide a delivery address to continue.', 'error')
+        return redirect(url_for('checkout'))
     
     # Create order items
     order_items = []
@@ -207,10 +198,6 @@ def place_order():
     
     # Create order
     order_id = get_next_id('order_id')
-    print(f"DEBUG: Creating order with ID: {order_id}, User ID: {user.id}")
-    print(f"DEBUG: Order items: {order_items}")
-    print(f"DEBUG: Total: {total}")
-    
     order = Order(
         order_id=order_id,
         user_id=user.id,
@@ -221,21 +208,16 @@ def place_order():
     )
     
     data_store['orders'][order_id] = order
-    print(f"DEBUG: Order stored in data_store. Total orders now: {len(data_store['orders'])}")
-    print(f"DEBUG: Orders in store: {list(data_store['orders'].keys())}")
     
     # Send confirmation email (but catch any errors)
     try:
         send_order_confirmation_email(user.email, order)
-        print(f"DEBUG: Email sent successfully")
     except Exception as e:
-        print(f"DEBUG: Email sending failed: {e}")
         # Continue anyway, don't let email failure stop order placement
+        pass
     
     # Clear cart
-    print(f"DEBUG: Cart before clearing: {session.get('cart', {})}")
     clear_cart()
-    print(f"DEBUG: Cart after clearing: {session.get('cart', {})}")
     
     flash(f'Order #{order_id} placed successfully! Confirmation email sent.', 'success')
     return redirect(url_for('order_tracking', order_id=order_id))
@@ -362,12 +344,7 @@ def user_orders():
         flash('Please login to view your orders.', 'error')
         return redirect(url_for('login'))
     
-    print(f"DEBUG: User {user.id} requesting orders")
-    print(f"DEBUG: Total orders in store: {len(data_store['orders'])}")
-    print(f"DEBUG: All orders: {list(data_store['orders'].keys())}")
-    
     user_orders_list = [order for order in data_store['orders'].values() if order.user_id == user.id]
-    print(f"DEBUG: Found {len(user_orders_list)} orders for user {user.id}")
     
     user_orders_list.sort(key=lambda x: x.created_at, reverse=True)
     
