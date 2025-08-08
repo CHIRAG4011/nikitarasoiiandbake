@@ -83,6 +83,7 @@ def get_cart_count():
 def clear_cart():
     """Clear the cart"""
     session['cart'] = {}
+    session.modified = True
 
 def send_order_confirmation_email(user_email, order):
     """Send order confirmation email"""

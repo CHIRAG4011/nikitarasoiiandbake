@@ -20,7 +20,8 @@ def inject_globals():
     return {
         'current_user': get_current_user(),
         'cart_count': get_cart_count(),
-        'cart_total': get_cart_total()
+        'cart_total': get_cart_total(),
+        'data_store': data_store
     }
 
 @app.route('/')
