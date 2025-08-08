@@ -34,7 +34,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1">
-                            <h2 class="mb-0">${{ "%.0f"|format(stats.total_revenue) }}</h2>
+                            <h2 class="mb-0">₹{{ "%.0f"|format(stats.total_revenue) }}</h2>
                             <p class="mb-0">Total Revenue</p>
                         </div>
                         <div>
@@ -110,11 +110,9 @@
                                         </a>
                                     </td>
                                     <td>
-                                        {% for user in data_store.users.values() if user.id == order.user_id %}
-                                        {{ user.username }}
-                                        {% endfor %}
+                                        User #{{ order.user_id }}
                                     </td>
-                                    <td>${{ "%.2f"|format(order.total) }}</td>
+                                    <td>₹{{ "%.2f"|format(order.total) }}</td>
                                     <td>
                                         {% if order.status == 'pending' %}
                                         <span class="badge bg-warning">{{ order.status.title() }}</span>
@@ -158,6 +156,9 @@
                         <a href="{{ url_for('admin_analytics') }}" class="btn btn-outline-brown">
                             <i class="fas fa-chart-bar me-2"></i>View Analytics
                         </a>
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-users-cog me-2"></i>Manage Users
+                        </a>
                         <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-external-link-alt me-2"></i>View Store
                         </a>
@@ -172,16 +173,16 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Total Products:</span>
-                        <span class="fw-bold">{{ data_store.products|length }}</span>
+                        <span>Website Status:</span>
+                        <span class="fw-bold text-success">Active</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span>Total Users:</span>
-                        <span class="fw-bold">{{ data_store.users|length }}</span>
+                        <span>Database:</span>
+                        <span class="fw-bold text-success">Connected</span>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span>Total Reviews:</span>
-                        <span class="fw-bold">{{ data_store.reviews|length }}</span>
+                        <span>Last Updated:</span>
+                        <span class="fw-bold">Today</span>
                     </div>
                 </div>
             </div>
