@@ -468,7 +468,11 @@ def admin_edit_product():
     if not user or not user.is_admin:
         return redirect(url_for('index'))
     
-    product_id = int(request.form.get('product_id'))
+    product_id_str = request.form.get('product_id')
+    if not product_id_str:
+        flash('Product ID is required.', 'error')
+        return redirect(url_for('admin_products'))
+    product_id = int(product_id_str)
     product = data_store['products'].get(product_id)
     
     if product:
