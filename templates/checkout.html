@@ -63,7 +63,7 @@
                     <div class="card-body">
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            Choose your preferred payment method. QR verification is required for digital payments.
+                            Secure payment powered by Razorpay. All major payment methods accepted.
                         </div>
                         
                         <!-- Payment Method Selection -->
@@ -72,98 +72,60 @@
                                 <label class="form-label">Select Payment Method:</label>
                                 <div class="payment-methods">
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="credit_card" id="credit_card" checked>
-                                        <label class="form-check-label" for="credit_card">
-                                            <i class="fab fa-cc-visa me-2"></i><i class="fab fa-cc-mastercard me-2"></i>Credit/Debit Card
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="paypal" id="paypal">
-                                        <label class="form-check-label" for="paypal">
-                                            <i class="fab fa-paypal me-2 text-primary"></i>PayPal
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="apple_pay" id="apple_pay">
-                                        <label class="form-check-label" for="apple_pay">
-                                            <i class="fab fa-apple-pay me-2"></i>Apple Pay
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="google_pay" id="google_pay">
-                                        <label class="form-check-label" for="google_pay">
-                                            <i class="fab fa-google-pay me-2"></i>Google Pay
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="crypto" id="crypto">
-                                        <label class="form-check-label" for="crypto">
-                                            <i class="fab fa-bitcoin me-2 text-warning"></i>Cryptocurrency
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="bank_transfer" id="bank_transfer">
-                                        <label class="form-check-label" for="bank_transfer">
-                                            <i class="fas fa-university me-2"></i>Bank Transfer
+                                        <input class="form-check-input" type="radio" name="payment_method" value="razorpay" id="razorpay" checked>
+                                        <label class="form-check-label" for="razorpay">
+                                            <i class="fas fa-credit-card me-2"></i>Card/UPI/NetBanking/Wallets
+                                            <small class="d-block text-muted">Visa, Mastercard, UPI, Google Pay, PhonePe, Paytm & more</small>
                                         </label>
                                     </div>
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="payment_method" value="cash_on_delivery" id="cash_on_delivery">
                                         <label class="form-check-label" for="cash_on_delivery">
                                             <i class="fas fa-money-bill-wave me-2 text-success"></i>Cash on Delivery
+                                            <small class="d-block text-muted">Pay when your order arrives</small>
                                         </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Credit Card Details -->
-                        <div id="credit_card_details" class="payment-details">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="cardName" class="form-label">Cardholder Name</label>
-                                    <input type="text" class="form-control" id="cardName" placeholder="John Doe">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="cardNumber" class="form-label">Card Number</label>
-                                    <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456">
-                                </div>
+                        <!-- Razorpay Payment Details -->
+                        <div id="razorpay_details" class="payment-details">
+                            <div class="alert alert-success">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                You will be redirected to secure Razorpay payment page after clicking "Place Order".
                             </div>
-                            
                             <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="expiry" class="form-label">Expiry Date</label>
-                                    <input type="text" class="form-control" id="expiry" placeholder="MM/YY">
+                                <div class="col-md-6">
+                                    <h6 class="mb-2">Accepted Payment Methods:</h6>
+                                    <ul class="list-unstyled small">
+                                        <li><i class="fas fa-check text-success me-2"></i>Credit & Debit Cards</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>UPI (Google Pay, PhonePe, etc.)</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Net Banking</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Digital Wallets</li>
+                                    </ul>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="cvv" class="form-label">CVV</label>
-                                    <input type="text" class="form-control" id="cvv" placeholder="123">
+                                <div class="col-md-6">
+                                    <h6 class="mb-2">Security Features:</h6>
+                                    <ul class="list-unstyled small">
+                                        <li><i class="fas fa-lock text-primary me-2"></i>256-bit SSL Encryption</li>
+                                        <li><i class="fas fa-shield-alt text-primary me-2"></i>PCI DSS Compliant</li>
+                                        <li><i class="fas fa-check-circle text-success me-2"></i>RBI Approved</li>
+                                        <li><i class="fas fa-users text-info me-2"></i>Trusted by 8M+ businesses</li>
+                                    </ul>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label for="cardType" class="form-label">Card Type</label>
-                                    <select class="form-select" id="cardType">
-                                        <option>Visa</option>
-                                        <option>Mastercard</option>
-                                        <option>American Express</option>
-                                        <option>Discover</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Digital Payment Details -->
-                        <div id="digital_payment_details" class="payment-details" style="display: none;">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-qrcode me-2"></i>
-                                QR code verification will be required for this payment method.
                             </div>
                         </div>
                         
                         <!-- Cash on Delivery Details -->
                         <div id="cash_delivery_details" class="payment-details" style="display: none;">
-                            <div class="alert alert-success">
+                            <div class="alert alert-info">
                                 <i class="fas fa-info-circle me-2"></i>
                                 Payment will be collected upon delivery. Please have exact change ready.
+                            </div>
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Additional ₹20 handling charges apply for Cash on Delivery orders.
                             </div>
                         </div>
                     </div>
@@ -179,8 +141,10 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-brown btn-lg" id="placeOrderBtn">
-                    <i class="fas fa-shopping-bag me-2"></i>Place Order
+                <button type="button" class="btn btn-brown btn-lg" id="placeOrderBtn" onclick="initiatePayment()">
+                    <i class="fas fa-shopping-bag me-2"></i>
+                    <span id="buttonText">Place Order</span>
+                    <span id="buttonSpinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
                 </button>
             </form>
         </div>
@@ -227,85 +191,29 @@
     </div>
 </div>
 
-<!-- QR Code Verification Modal -->
-<div class="modal fade" id="qrVerificationModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-lg">
+<!-- Payment Success Modal -->
+<div class="modal fade" id="paymentSuccessModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-success text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-qrcode me-2"></i>Payment Verification
+                    <i class="fas fa-check-circle me-2"></i>Payment Successful!
                 </h5>
-                <div class="timer-display">
-                    <span class="badge bg-warning fs-6" id="qrTimer">2:00</span>
-                </div>
             </div>
             <div class="modal-body text-center">
-                <div id="qrCodeContainer">
-                    <div class="mb-4">
-                        <h4 class="text-brown">Scan QR Code to Complete Payment</h4>
-                        <p class="text-muted">Use your mobile device to scan the QR code below</p>
-                    </div>
-                    
-                    <!-- QR Code Display -->
-                    <div class="qr-code-wrapper mb-4">
-                        <div id="qrCode" class="qr-code">
-                            <!-- QR code will be generated here -->
-                            <div class="qr-placeholder">
-                                <canvas id="qrCanvas" width="200" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <i class="fas fa-mobile-alt me-2"></i>
-                        Open your payment app and scan this QR code to authorize the transaction
-                    </div>
+                <div class="mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
                 </div>
-                
-                <!-- Screenshot Upload -->
-                <div id="screenshotUpload" style="display: none;">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-clock me-2"></i>
-                        Time expired! Please upload a screenshot of your payment confirmation for verification.
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="paymentScreenshot" class="form-label">Upload Payment Screenshot</label>
-                        <input type="file" class="form-control" id="paymentScreenshot" accept="image/*" required>
-                        <small class="form-text text-muted">Accepted formats: JPG, PNG, GIF (Max 5MB)</small>
-                    </div>
-                    
-                    <div class="screenshot-preview" id="screenshotPreview" style="display: none;">
-                        <img id="previewImage" src="" alt="Screenshot Preview" class="img-fluid rounded mb-3" style="max-height: 200px;">
-                    </div>
-                </div>
-                
-                <!-- Payment Status -->
-                <div id="paymentStatus" class="payment-status" style="display: none;">
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Payment verification submitted successfully!
-                    </div>
+                <h4 class="text-success mb-3">Order Placed Successfully!</h4>
+                <p class="text-muted mb-4">Thank you for your order. You will receive a confirmation email shortly.</p>
+                <div id="orderDetails" class="alert alert-light">
+                    <strong>Order #<span id="orderNumber"></span></strong><br>
+                    <small class="text-muted">Track your order in the "My Orders" section</small>
                 </div>
             </div>
             <div class="modal-footer">
-                <div id="qrActions">
-                    <button type="button" class="btn btn-secondary" id="cancelPayment">Cancel Payment</button>
-                    <button type="button" class="btn btn-brown" id="refreshQR">
-                        <i class="fas fa-sync-alt me-2"></i>Refresh QR Code
-                    </button>
-                </div>
-                <div id="uploadActions" style="display: none;">
-                    <button type="button" class="btn btn-secondary" id="cancelUpload">Cancel</button>
-                    <button type="button" class="btn btn-success" id="submitScreenshot">
-                        <i class="fas fa-upload me-2"></i>Submit Verification
-                    </button>
-                </div>
-                <div id="processingActions" style="display: none;">
-                    <button type="button" class="btn btn-brown" id="proceedToOrder">
-                        <i class="fas fa-arrow-right me-2"></i>Complete Order
-                    </button>
-                </div>
+                <button type="button" class="btn btn-brown" onclick="window.location.href='/'">Continue Shopping</button>
+                <button type="button" class="btn btn-outline-brown" id="viewOrderBtn">View Order</button>
             </div>
         </div>
     </div>
@@ -313,71 +221,171 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<!-- Razorpay SDK -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
-// Enhanced Checkout JavaScript with QR Verification
-class CheckoutManager {
-    constructor() {
-        this.qrTimer = null;
-        this.qrTimeLeft = 120; // 2 minutes in seconds
-        this.qrModal = null;
-        this.init();
+// Razorpay Payment Integration
+function initiatePayment() {
+    const button = document.getElementById('placeOrderBtn');
+    const buttonText = document.getElementById('buttonText');
+    const spinner = document.getElementById('buttonSpinner');
+    
+    // Validate address selection
+    if (!validateAddress()) {
+        alert('Please select or enter a delivery address.');
+        return;
     }
-
-    init() {
-        this.bindEvents();
-        this.initializePaymentMethods();
-        this.qrModal = new bootstrap.Modal(document.getElementById('qrVerificationModal'));
-    }
-
-    bindEvents() {
-        // Payment method change
-        document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-            radio.addEventListener('change', (e) => this.handlePaymentMethodChange(e));
-        });
-
-        // Form submission
-        document.getElementById('placeOrderBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            this.handleOrderSubmission();
-        });
-
-        // QR Modal events
-        document.getElementById('refreshQR').addEventListener('click', () => this.generateQRCode());
-        document.getElementById('cancelPayment').addEventListener('click', () => this.closeQRModal());
-        document.getElementById('cancelUpload').addEventListener('click', () => this.closeQRModal());
-        document.getElementById('submitScreenshot').addEventListener('click', () => this.submitScreenshot());
-        document.getElementById('proceedToOrder').addEventListener('click', () => this.completeOrder());
-
-        // Screenshot upload
-        document.getElementById('paymentScreenshot').addEventListener('change', (e) => this.handleScreenshotUpload(e));
-
-        // Address form toggle
-        if (document.getElementById('newAddress')) {
-            document.getElementById('newAddress').addEventListener('change', () => this.toggleNewAddress());
+    
+    // Show loading state
+    button.disabled = true;
+    buttonText.textContent = 'Processing...';
+    spinner.style.display = 'inline-block';
+    
+    // Get form data
+    const form = document.querySelector('form');
+    const formData = new FormData(form);
+    
+    // Create payment order
+    fetch('/create_payment_order', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to create payment order');
         }
-
-        // Card formatting
-        this.initializeCardFormatting();
-    }
-
-    handlePaymentMethodChange(e) {
-        const method = e.target.value;
-        const digitalMethods = ['paypal', 'apple_pay', 'google_pay', 'crypto', 'bank_transfer'];
         
-        // Hide all payment details
-        document.querySelectorAll('.payment-details').forEach(div => {
-            div.style.display = 'none';
-        });
-
-        // Show relevant payment details
-        if (method === 'credit_card') {
-            document.getElementById('credit_card_details').style.display = 'block';
-        } else if (digitalMethods.includes(method)) {
-            document.getElementById('digital_payment_details').style.display = 'block';
-        } else if (method === 'cash_on_delivery') {
-            document.getElementById('cash_delivery_details').style.display = 'block';
+        // Handle Cash on Delivery
+        if (data.cash_order) {
+            showSuccessMessage(data.message, data.order_id);
+            return;
         }
+        
+        // Initialize Razorpay payment
+        initializeRazorpayPayment(data);
+    })
+    .catch(error => {
+        console.error('Payment Error:', error);
+        alert('Error: ' + error.message);
+    })
+    .finally(() => {
+        // Reset button state
+        button.disabled = false;
+        buttonText.textContent = 'Place Order';
+        spinner.style.display = 'none';
+    });
+}
+
+function initializeRazorpayPayment(orderData) {
+    const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: orderData.name,
+        description: orderData.description,
+        order_id: orderData.order_id,
+        prefill: orderData.prefill,
+        theme: {
+            color: '#8B4513' // Brown theme matching bakery
+        },
+        handler: function(response) {
+            // Payment successful, verify on server
+            verifyPayment(response);
+        },
+        modal: {
+            ondismiss: function() {
+                console.log('Payment modal dismissed');
+                // Payment was closed/cancelled
+                alert('Payment cancelled. You can retry the payment anytime.');
+            }
+        }
+    };
+    
+    const rzp = new Razorpay(options);
+    rzp.open();
+}
+
+function verifyPayment(paymentResponse) {
+    const formData = new FormData();
+    formData.append('razorpay_payment_id', paymentResponse.razorpay_payment_id);
+    formData.append('razorpay_order_id', paymentResponse.razorpay_order_id);
+    formData.append('razorpay_signature', paymentResponse.razorpay_signature);
+    
+    fetch('/verify_payment', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessMessage(data.message, data.order_id);
+        } else {
+            throw new Error(data.error || 'Payment verification failed');
+        }
+    })
+    .catch(error => {
+        console.error('Verification Error:', error);
+        alert('Payment verification failed: ' + error.message);
+        // Show contact support message
+        alert('Please contact our support team with your payment ID: ' + paymentResponse.razorpay_payment_id);
+    });
+}
+
+function showSuccessMessage(message, orderId) {
+    // Show success modal instead of alert
+    document.getElementById('orderNumber').textContent = orderId;
+    
+    // Set up view order button
+    document.getElementById('viewOrderBtn').onclick = function() {
+        window.location.href = '/order_tracking/' + orderId;
+    };
+    
+    // Show the modal
+    const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
+    successModal.show();
+}
+
+function validateAddress() {
+    const addressId = document.querySelector('input[name="address_id"]:checked');
+    const newAddress = document.getElementById('new_address');
+    
+    if (addressId) {
+        return true;
     }
+    
+    if (newAddress && newAddress.value.trim()) {
+        return true;
+    }
+    
+    return false;
+}
+
+// Handle payment method changes
+document.addEventListener('DOMContentLoaded', function() {
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const razorpayDetails = document.getElementById('razorpay_details');
+    const cashDetails = document.getElementById('cash_delivery_details');
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            if (this.value === 'razorpay') {
+                razorpayDetails.style.display = 'block';
+                cashDetails.style.display = 'none';
+            } else if (this.value === 'cash_on_delivery') {
+                razorpayDetails.style.display = 'none';
+                cashDetails.style.display = 'block';
+            }
+        });
+    });
+    
+    // Initialize with default selection
+    const defaultMethod = document.querySelector('input[name="payment_method"]:checked');
+    if (defaultMethod) {
+        defaultMethod.dispatchEvent(new Event('change'));
+    }
+});
 
     handleOrderSubmission() {
         // Validate address first

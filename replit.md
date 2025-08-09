@@ -49,6 +49,7 @@ Preferred communication style: Simple, everyday language.
 - **Flask**: Core web framework for routing and request handling
 - **Flask-Mail**: Email sending capabilities for order confirmations
 - **Werkzeug**: Password hashing and WSGI utilities
+- **Razorpay**: Payment gateway integration for secure online payments
 
 ### Frontend Libraries
 - **Bootstrap 5**: CSS framework loaded via CDN for responsive design
@@ -134,6 +135,18 @@ Preferred communication style: Simple, everyday language.
 - **Product Filtering**: Enhanced product filtering to work with dynamic database categories
 - **Delete Functionality**: Added delete capabilities for both categories and products with safety checks
 - **Data Integrity**: Categories with products cannot be deleted; product deletion removes associated reviews
+
+### Razorpay Payment Integration (August 9, 2025)
+- **Payment Gateway**: Integrated Razorpay as the primary payment gateway for Indian market
+- **Multiple Payment Methods**: Added support for Credit/Debit Cards, UPI, Net Banking, and Digital Wallets
+- **Cash on Delivery**: Maintained COD option with additional handling charges (₹20)
+- **Payment Security**: Implemented server-side payment signature verification
+- **Order Management**: Enhanced order creation flow with payment status tracking
+- **User Experience**: Added Razorpay checkout modal with bakery-themed branding (#8B4513 brown)
+- **Payment Verification**: Added secure payment verification using Razorpay webhook signatures
+- **Error Handling**: Comprehensive error handling for failed payments and verification
+- **Session Management**: Secure payment session management with order details storage
+- **Mobile Optimized**: Responsive payment interface supporting mobile and desktop users
 
 ### Deployment Documentation (August 8, 2025)
 - **Comprehensive Deployment Guide**: Created extensive DEPLOYMENT_GUIDE.md with 890+ lines covering local and free hosting
