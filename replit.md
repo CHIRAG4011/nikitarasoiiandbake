@@ -132,6 +132,8 @@ Preferred communication style: Simple, everyday language.
 - **Navigation Enhancement**: Added Categories link to main navigation menu
 - **Admin Dashboard Integration**: Added category management access to admin quick actions
 - **Product Filtering**: Enhanced product filtering to work with dynamic database categories
+- **Delete Functionality**: Added delete capabilities for both categories and products with safety checks
+- **Data Integrity**: Categories with products cannot be deleted; product deletion removes associated reviews
 
 ### Deployment Documentation (August 8, 2025)
 - **Comprehensive Deployment Guide**: Created extensive DEPLOYMENT_GUIDE.md with 890+ lines covering local and free hosting

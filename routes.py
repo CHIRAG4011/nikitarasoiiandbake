@@ -697,6 +697,57 @@ def admin_toggle_category_status(category_id):
     
     return redirect(url_for('admin_categories'))
 
+@app.route('/admin/delete_category/<int:category_id>', methods=['POST', 'GET'])
+def admin_delete_category(category_id):
+    """Delete a category"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    category = data_store['categories'].get(category_id)
+    if not category:
+        flash('Category not found.', 'error')
+        return redirect(url_for('admin_categories'))
+    
+    # Check if category has products
+    products_in_category = [p for p in data_store['products'].values() if p.category == category.name]
+    if products_in_category:
+        flash(f'Cannot delete category "{category.name}" because it contains {len(products_in_category)} products. Please move or delete these products first.', 'error')
+        return redirect(url_for('admin_categories'))
+    
+    # Delete the category
+    category_name = category.name
+    del data_store['categories'][category_id]
+    flash(f'Category "{category_name}" deleted successfully!', 'success')
+    
+    return redirect(url_for('admin_categories'))
+
+@app.route('/admin/delete_product/<int:product_id>', methods=['POST'])
+def admin_delete_product(product_id):
+    """Delete a product"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    product = data_store['products'].get(product_id)
+    if not product:
+        flash('Product not found.', 'error')
+        return redirect(url_for('admin_products'))
+    
+    # Delete associated reviews
+    reviews_to_delete = [r_id for r_id, review in data_store['reviews'].items() if review.product_id == product_id]
+    for review_id in reviews_to_delete:
+        del data_store['reviews'][review_id]
+    
+    # Delete the product
+    product_name = product.name
+    del data_store['products'][product_id]
+    flash(f'Product "{product_name}" and its {len(reviews_to_delete)} reviews deleted successfully!', 'success')
+    
+    return redirect(url_for('admin_products'))
+
 @app.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
 def toggle_admin(user_id):
     """Toggle admin privileges for a user"""
