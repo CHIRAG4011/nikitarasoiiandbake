@@ -460,7 +460,8 @@ def admin_products():
         return redirect(url_for('index'))
     
     products = list(data_store['products'].values())
-    return render_template('admin/products.html', products=products)
+    categories = list(data_store['categories'].values())
+    return render_template('admin/products.html', products=products, categories=categories)
 
 @app.route('/admin/add_product', methods=['POST'])
 def admin_add_product():
