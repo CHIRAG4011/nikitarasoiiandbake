@@ -49,7 +49,7 @@ Preferred communication style: Simple, everyday language.
 - **Flask**: Core web framework for routing and request handling
 - **Flask-Mail**: Email sending capabilities for order confirmations
 - **Werkzeug**: Password hashing and WSGI utilities
-- **Razorpay**: Payment gateway integration for secure online payments
+
 
 ### Frontend Libraries
 - **Bootstrap 5**: CSS framework loaded via CDN for responsive design
@@ -136,17 +136,17 @@ Preferred communication style: Simple, everyday language.
 - **Delete Functionality**: Added delete capabilities for both categories and products with safety checks
 - **Data Integrity**: Categories with products cannot be deleted; product deletion removes associated reviews
 
-### Razorpay Payment Integration (August 9, 2025)
-- **Payment Gateway**: Integrated Razorpay as the primary payment gateway for Indian market
-- **Multiple Payment Methods**: Added support for Credit/Debit Cards, UPI, Net Banking, and Digital Wallets
-- **Cash on Delivery**: Maintained COD option with additional handling charges (₹20)
-- **Payment Security**: Implemented server-side payment signature verification
-- **Order Management**: Enhanced order creation flow with payment status tracking
-- **User Experience**: Added Razorpay checkout modal with bakery-themed branding (#8B4513 brown)
-- **Payment Verification**: Added secure payment verification using Razorpay webhook signatures
-- **Error Handling**: Comprehensive error handling for failed payments and verification
-- **Session Management**: Secure payment session management with order details storage
-- **Mobile Optimized**: Responsive payment interface supporting mobile and desktop users
+### QR Code Payment Integration (August 9, 2025)
+- **Custom Payment Gateway**: Replaced third-party payment gateway with custom QR code payment system
+- **UPI QR Code**: Integrated personal UPI QR code (7016377439@fam) for direct payments
+- **Payment Methods**: Support for QR code payments via any UPI app (Google Pay, PhonePe, Paytm, etc.)
+- **Cash on Delivery**: Maintained COD option with ₹20 handling charges
+- **Order Flow**: Enhanced order creation with payment status tracking (payment_pending → confirmed)
+- **QR Payment Page**: Dedicated payment page displaying QR code with clear instructions
+- **Payment Confirmation**: Manual payment confirmation system with order status updates
+- **User Experience**: Simple scan-and-pay interface with step-by-step instructions
+- **Mobile Optimized**: QR code optimized for mobile scanning and payment
+- **Payment Tracking**: Order status updates based on payment confirmation
 
 ### Deployment Documentation (August 8, 2025)
 - **Comprehensive Deployment Guide**: Created extensive DEPLOYMENT_GUIDE.md with 890+ lines covering local and free hosting

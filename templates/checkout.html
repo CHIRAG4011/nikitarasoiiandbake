@@ -10,7 +10,7 @@
     
     <div class="row">
         <div class="col-lg-8">
-            <form method="post" action="{{ url_for('place_order') }}">
+            <form method="post" action="{{ url_for('place_order') }}" onsubmit="return validateCheckoutForm()">
                 <!-- Shipping Address -->
                 <div class="card mb-4">
                     <div class="card-header">
@@ -63,7 +63,7 @@
                     <div class="card-body">
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            Secure payment powered by Razorpay. All major payment methods accepted.
+                            Choose your preferred payment method. QR code payment available for instant processing.
                         </div>
                         
                         <!-- Payment Method Selection -->
@@ -72,46 +72,46 @@
                                 <label class="form-label">Select Payment Method:</label>
                                 <div class="payment-methods">
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="radio" name="payment_method" value="razorpay" id="razorpay" checked>
-                                        <label class="form-check-label" for="razorpay">
-                                            <i class="fas fa-credit-card me-2"></i>Card/UPI/NetBanking/Wallets
-                                            <small class="d-block text-muted">Visa, Mastercard, UPI, Google Pay, PhonePe, Paytm & more</small>
+                                        <input class="form-check-input" type="radio" name="payment_method" value="qr_payment" id="qr_payment" checked>
+                                        <label class="form-check-label" for="qr_payment">
+                                            <i class="fas fa-qrcode me-2"></i>QR Code Payment
+                                            <small class="d-block text-muted">Scan QR code to pay via UPI/Banking app</small>
                                         </label>
                                     </div>
                                     <div class="form-check mb-3">
                                         <input class="form-check-input" type="radio" name="payment_method" value="cash_on_delivery" id="cash_on_delivery">
                                         <label class="form-check-label" for="cash_on_delivery">
                                             <i class="fas fa-money-bill-wave me-2 text-success"></i>Cash on Delivery
-                                            <small class="d-block text-muted">Pay when your order arrives</small>
+                                            <small class="d-block text-muted">Pay when your order arrives + ₹20 handling charges</small>
                                         </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Razorpay Payment Details -->
-                        <div id="razorpay_details" class="payment-details">
+                        <!-- QR Payment Details -->
+                        <div id="qr_payment_details" class="payment-details">
                             <div class="alert alert-success">
-                                <i class="fas fa-shield-alt me-2"></i>
-                                You will be redirected to secure Razorpay payment page after clicking "Place Order".
+                                <i class="fas fa-qrcode me-2"></i>
+                                You will be shown a QR code to scan with your UPI app after clicking "Place Order".
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h6 class="mb-2">Accepted Payment Methods:</h6>
+                                    <h6 class="mb-2">Supported Apps:</h6>
                                     <ul class="list-unstyled small">
-                                        <li><i class="fas fa-check text-success me-2"></i>Credit & Debit Cards</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>UPI (Google Pay, PhonePe, etc.)</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Net Banking</li>
-                                        <li><i class="fas fa-check text-success me-2"></i>Digital Wallets</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Google Pay</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>PhonePe</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Paytm</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Any UPI App</li>
                                     </ul>
                                 </div>
                                 <div class="col-md-6">
-                                    <h6 class="mb-2">Security Features:</h6>
+                                    <h6 class="mb-2">How it works:</h6>
                                     <ul class="list-unstyled small">
-                                        <li><i class="fas fa-lock text-primary me-2"></i>256-bit SSL Encryption</li>
-                                        <li><i class="fas fa-shield-alt text-primary me-2"></i>PCI DSS Compliant</li>
-                                        <li><i class="fas fa-check-circle text-success me-2"></i>RBI Approved</li>
-                                        <li><i class="fas fa-users text-info me-2"></i>Trusted by 8M+ businesses</li>
+                                        <li><i class="fas fa-mobile-alt text-primary me-2"></i>Scan QR code with your app</li>
+                                        <li><i class="fas fa-rupee-sign text-primary me-2"></i>Confirm payment amount</li>
+                                        <li><i class="fas fa-check-circle text-success me-2"></i>Complete payment</li>
+                                        <li><i class="fas fa-shopping-bag text-info me-2"></i>Order confirmed instantly</li>
                                     </ul>
                                 </div>
                             </div>
@@ -141,10 +141,9 @@
                     </div>
                 </div>
                 
-                <button type="button" class="btn btn-brown btn-lg" id="placeOrderBtn" onclick="initiatePayment()">
+                <button type="submit" class="btn btn-brown btn-lg" id="placeOrderBtn">
                     <i class="fas fa-shopping-bag me-2"></i>
-                    <span id="buttonText">Place Order</span>
-                    <span id="buttonSpinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                    Place Order
                 </button>
             </form>
         </div>
@@ -221,160 +220,33 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Razorpay SDK -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
 <script>
-// Razorpay Payment Integration
-function initiatePayment() {
-    const button = document.getElementById('placeOrderBtn');
-    const buttonText = document.getElementById('buttonText');
-    const spinner = document.getElementById('buttonSpinner');
-    
+function validateCheckoutForm() {
     // Validate address selection
-    if (!validateAddress()) {
-        alert('Please select or enter a delivery address.');
-        return;
-    }
-    
-    // Show loading state
-    button.disabled = true;
-    buttonText.textContent = 'Processing...';
-    spinner.style.display = 'inline-block';
-    
-    // Get form data
-    const form = document.querySelector('form');
-    const formData = new FormData(form);
-    
-    // Create payment order
-    fetch('/create_payment_order', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            throw new Error(data.error || 'Failed to create payment order');
-        }
-        
-        // Handle Cash on Delivery
-        if (data.cash_order) {
-            showSuccessMessage(data.message, data.order_id);
-            return;
-        }
-        
-        // Initialize Razorpay payment
-        initializeRazorpayPayment(data);
-    })
-    .catch(error => {
-        console.error('Payment Error:', error);
-        alert('Error: ' + error.message);
-    })
-    .finally(() => {
-        // Reset button state
-        button.disabled = false;
-        buttonText.textContent = 'Place Order';
-        spinner.style.display = 'none';
-    });
-}
-
-function initializeRazorpayPayment(orderData) {
-    const options = {
-        key: orderData.key,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: orderData.name,
-        description: orderData.description,
-        order_id: orderData.order_id,
-        prefill: orderData.prefill,
-        theme: {
-            color: '#8B4513' // Brown theme matching bakery
-        },
-        handler: function(response) {
-            // Payment successful, verify on server
-            verifyPayment(response);
-        },
-        modal: {
-            ondismiss: function() {
-                console.log('Payment modal dismissed');
-                // Payment was closed/cancelled
-                alert('Payment cancelled. You can retry the payment anytime.');
-            }
-        }
-    };
-    
-    const rzp = new Razorpay(options);
-    rzp.open();
-}
-
-function verifyPayment(paymentResponse) {
-    const formData = new FormData();
-    formData.append('razorpay_payment_id', paymentResponse.razorpay_payment_id);
-    formData.append('razorpay_order_id', paymentResponse.razorpay_order_id);
-    formData.append('razorpay_signature', paymentResponse.razorpay_signature);
-    
-    fetch('/verify_payment', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccessMessage(data.message, data.order_id);
-        } else {
-            throw new Error(data.error || 'Payment verification failed');
-        }
-    })
-    .catch(error => {
-        console.error('Verification Error:', error);
-        alert('Payment verification failed: ' + error.message);
-        // Show contact support message
-        alert('Please contact our support team with your payment ID: ' + paymentResponse.razorpay_payment_id);
-    });
-}
-
-function showSuccessMessage(message, orderId) {
-    // Show success modal instead of alert
-    document.getElementById('orderNumber').textContent = orderId;
-    
-    // Set up view order button
-    document.getElementById('viewOrderBtn').onclick = function() {
-        window.location.href = '/order_tracking/' + orderId;
-    };
-    
-    // Show the modal
-    const successModal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
-    successModal.show();
-}
-
-function validateAddress() {
     const addressId = document.querySelector('input[name="address_id"]:checked');
     const newAddress = document.getElementById('new_address');
     
-    if (addressId) {
-        return true;
+    if (!addressId && (!newAddress || !newAddress.value.trim())) {
+        alert('Please select or enter a delivery address.');
+        return false;
     }
     
-    if (newAddress && newAddress.value.trim()) {
-        return true;
-    }
-    
-    return false;
+    return true;
 }
 
 // Handle payment method changes
 document.addEventListener('DOMContentLoaded', function() {
     const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
-    const razorpayDetails = document.getElementById('razorpay_details');
+    const qrDetails = document.getElementById('qr_payment_details');
     const cashDetails = document.getElementById('cash_delivery_details');
     
     paymentMethods.forEach(method => {
         method.addEventListener('change', function() {
-            if (this.value === 'razorpay') {
-                razorpayDetails.style.display = 'block';
+            if (this.value === 'qr_payment') {
+                qrDetails.style.display = 'block';
                 cashDetails.style.display = 'none';
             } else if (this.value === 'cash_on_delivery') {
-                razorpayDetails.style.display = 'none';
+                qrDetails.style.display = 'none';
                 cashDetails.style.display = 'block';
             }
         });
@@ -385,6 +257,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (defaultMethod) {
         defaultMethod.dispatchEvent(new Event('change'));
     }
+    
+    // Toggle new address form
+    function toggleNewAddress() {
+        const newAddressRadio = document.getElementById('newAddress');
+        const newAddressForm = document.getElementById('newAddressForm');
+        
+        if (newAddressRadio && newAddressRadio.checked) {
+            newAddressForm.style.display = 'block';
+        } else {
+            newAddressForm.style.display = 'none';
+        }
+    }
+    
+    // Bind toggle function to address type radio buttons
+    const addressTypeRadios = document.querySelectorAll('input[name="address_type"]');
+    addressTypeRadios.forEach(radio => {
+        radio.addEventListener('change', toggleNewAddress);
+    });
 });
 
     handleOrderSubmission() {

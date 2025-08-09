@@ -6,7 +6,6 @@ from data_store import data_store, add_visitor_log, get_next_id, get_weekly_visi
 from utils import (get_current_user, add_to_cart, remove_from_cart, update_cart_quantity, 
                   get_cart_total, get_cart_count, clear_cart, send_order_confirmation_email,
                   calculate_order_stats, search_products, get_cart)
-from payment_config import razorpay_config
 import logging
 from datetime import datetime
 import json
@@ -172,43 +171,46 @@ def checkout():
     user_addresses = [addr for addr in data_store['addresses'].values() 
                      if addr.user_id == user.id]
     
-    # Calculate final amount for Razorpay
+    # Calculate final amount
     cart_total = get_cart_total()
     delivery_fee = 50.00
     tax_amount = (cart_total + delivery_fee) * 0.18
     final_amount = cart_total + delivery_fee + tax_amount
     
     return render_template('checkout.html', 
-                         addresses=user_addresses, 
-                         razorpay_key_id=razorpay_config.key_id,
+                         addresses=user_addresses,
                          final_amount=final_amount)
 
-@app.route('/create_payment_order', methods=['POST'])
-def create_payment_order():
-    """Create Razorpay payment order"""
+@app.route('/place_order', methods=['POST'])
+def place_order():
+    """Process order placement with QR code or COD payment"""
     user = get_current_user()
     if not user:
-        return jsonify({'error': 'Please login to proceed'}), 401
+        flash('Please login to place an order.', 'error')
+        return redirect(url_for('login'))
     
     cart_data = get_cart()
     if not cart_data:
-        return jsonify({'error': 'Your cart is empty'}), 400
+        flash('Your cart is empty.', 'error')
+        return redirect(url_for('cart'))
     
     # Get shipping address
     address_id = request.form.get('address_id')
     new_address = request.form.get('new_address')
-    payment_method = request.form.get('payment_method', 'razorpay')
+    payment_method = request.form.get('payment_method', 'qr_payment')
     
     if address_id:
         address = data_store['addresses'].get(int(address_id))
         if address:
             shipping_address = f"{address.name}, {address.street}, {address.city}, {address.state} {address.zip_code}"
         else:
-            return jsonify({'error': 'Selected address not found'}), 400
+            flash('Selected address not found.', 'error')
+            return redirect(url_for('checkout'))
     elif new_address and new_address.strip():
         shipping_address = new_address.strip()
     else:
-        return jsonify({'error': 'Please provide a delivery address'}), 400
+        flash('Please provide a delivery address to continue.', 'error')
+        return redirect(url_for('checkout'))
     
     # Calculate final amount
     cart_total = get_cart_total()
@@ -216,126 +218,11 @@ def create_payment_order():
     tax_amount = (cart_total + delivery_fee) * 0.18
     final_amount = cart_total + delivery_fee + tax_amount
     
-    # Handle Cash on Delivery
+    # Add COD charges for cash on delivery
     if payment_method == 'cash_on_delivery':
-        return process_cash_order(shipping_address, final_amount, user, cart_data)
+        final_amount += 20.00  # COD handling charges
     
-    # Create Razorpay order for online payments
-    order_receipt = f"order_{user.id}_{int(final_amount * 100)}"
-    razorpay_order = razorpay_config.create_order(
-        amount=final_amount,
-        currency='INR',
-        receipt=order_receipt,
-        notes={
-            'user_id': str(user.id),
-            'user_email': user.email,
-            'shipping_address': shipping_address
-        }
-    )
-    
-    if not razorpay_order:
-        return jsonify({'error': 'Failed to create payment order'}), 500
-    
-    # Store order details in session for verification later
-    session['pending_order'] = {
-        'razorpay_order_id': razorpay_order['id'],
-        'amount': final_amount,
-        'shipping_address': shipping_address,
-        'payment_method': payment_method,
-        'cart_data': cart_data
-    }
-    
-    return jsonify({
-        'success': True,
-        'order_id': razorpay_order['id'],
-        'amount': int(final_amount * 100),  # Amount in paisa
-        'currency': 'INR',
-        'key': razorpay_config.key_id,
-        'name': 'NIKITA RASOI & BAKES',
-        'description': f'Order payment for {len(cart_data)} items',
-        'prefill': {
-            'name': user.username,
-            'email': user.email
-        }
-    })
-
-@app.route('/verify_payment', methods=['POST'])
-def verify_payment():
-    """Verify Razorpay payment and create order"""
-    user = get_current_user()
-    if not user:
-        return jsonify({'error': 'Please login to proceed'}), 401
-    
-    # Get payment details
-    payment_id = request.form.get('razorpay_payment_id')
-    order_id = request.form.get('razorpay_order_id')
-    signature = request.form.get('razorpay_signature')
-    
-    if not all([payment_id, order_id, signature]):
-        return jsonify({'error': 'Missing payment details'}), 400
-    
-    # Get pending order from session
-    pending_order = session.get('pending_order')
-    if not pending_order or pending_order['razorpay_order_id'] != order_id:
-        return jsonify({'error': 'Invalid order session'}), 400
-    
-    # Verify payment signature
-    if not razorpay_config.verify_payment(payment_id, order_id, signature):
-        return jsonify({'error': 'Payment verification failed'}), 400
-    
-    # Payment verified, create the order
-    try:
-        order_id = create_confirmed_order(
-            user, 
-            pending_order['cart_data'], 
-            pending_order['amount'], 
-            pending_order['shipping_address'],
-            'paid',
-            payment_id
-        )
-        
-        # Clear session and cart
-        session.pop('pending_order', None)
-        clear_cart()
-        
-        return jsonify({
-            'success': True,
-            'message': f'Order #{order_id} placed successfully!',
-            'order_id': order_id
-        })
-        
-    except Exception as e:
-        logging.error(f"Error creating order after payment: {e}")
-        return jsonify({'error': 'Order creation failed'}), 500
-
-def process_cash_order(shipping_address, final_amount, user, cart_data):
-    """Process cash on delivery order"""
-    try:
-        order_id = create_confirmed_order(
-            user, 
-            cart_data, 
-            final_amount, 
-            shipping_address,
-            'pending',
-            None
-        )
-        
-        clear_cart()
-        
-        return jsonify({
-            'success': True,
-            'cash_order': True,
-            'message': f'Order #{order_id} placed successfully! Payment will be collected on delivery.',
-            'order_id': order_id
-        })
-        
-    except Exception as e:
-        logging.error(f"Error creating cash order: {e}")
-        return jsonify({'error': 'Order creation failed'}), 500
-
-def create_confirmed_order(user, cart_data, total, shipping_address, status='confirmed', payment_id=None):
-    """Helper function to create confirmed order"""
-    # Create order items and update stock
+    # Create order items and validate stock
     order_items = []
     
     for product_id_str, item_data in cart_data.items():
@@ -343,7 +230,8 @@ def create_confirmed_order(user, cart_data, total, shipping_address, status='con
         product = data_store['products'].get(product_id)
         
         if not product or product.stock < item_data['quantity']:
-            raise Exception(f'Insufficient stock for {product.name if product else "unknown item"}')
+            flash(f'Insufficient stock for {product.name if product else "unknown item"}.', 'error')
+            return redirect(url_for('cart'))
         
         order_items.append({
             'product_id': product_id,
@@ -356,21 +244,24 @@ def create_confirmed_order(user, cart_data, total, shipping_address, status='con
     
     # Create order
     order_id = get_next_id('order_id')
+    
+    # Set order status based on payment method
+    if payment_method == 'cash_on_delivery':
+        status = 'pending'
+    else:
+        status = 'payment_pending'  # Waiting for QR payment confirmation
+    
     order = Order(
         order_id=order_id,
         user_id=user.id,
         items=order_items,
-        total=total,
+        total=final_amount,
         shipping_address=shipping_address,
         status=status
     )
     
-    # Add payment info if available
-    if payment_id:
-        order.payment_id = payment_id
-        order.payment_method = 'razorpay'
-    else:
-        order.payment_method = 'cash_on_delivery'
+    # Add payment method info
+    order.payment_method = payment_method
     
     data_store['orders'][order_id] = order
     
@@ -380,12 +271,66 @@ def create_confirmed_order(user, cart_data, total, shipping_address, status='con
     except Exception as e:
         logging.warning(f"Failed to send confirmation email: {e}")
     
-    return order_id
+    # Clear cart
+    clear_cart()
+    
+    # Redirect based on payment method
+    if payment_method == 'cash_on_delivery':
+        flash(f'Order #{order_id} placed successfully! Payment will be collected on delivery.', 'success')
+        return redirect(url_for('order_tracking', order_id=order_id))
+    else:
+        # Redirect to QR payment page
+        session['payment_order_id'] = order_id
+        session['payment_amount'] = final_amount
+        return redirect(url_for('qr_payment'))
 
-@app.route('/place_order', methods=['POST'])
-def place_order():
-    """Legacy place order endpoint - redirect to payment flow"""
-    return redirect(url_for('checkout'))
+@app.route('/qr_payment')
+def qr_payment():
+    """QR code payment page"""
+    user = get_current_user()
+    if not user:
+        flash('Please login to continue.', 'error')
+        return redirect(url_for('login'))
+    
+    order_id = session.get('payment_order_id')
+    amount = session.get('payment_amount')
+    
+    if not order_id or not amount:
+        flash('Invalid payment session.', 'error')
+        return redirect(url_for('index'))
+    
+    # Get order details
+    order = data_store['orders'].get(order_id)
+    if not order:
+        flash('Order not found.', 'error')
+        return redirect(url_for('index'))
+    
+    return render_template('qr_payment.html', 
+                         order_id=order_id, 
+                         amount=amount,
+                         order=order)
+
+@app.route('/confirm_payment/<int:order_id>', methods=['POST'])
+def confirm_payment(order_id):
+    """Confirm QR code payment"""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Please login to proceed'}), 401
+    
+    order = data_store['orders'].get(order_id)
+    if not order or order.user_id != user.id:
+        return jsonify({'error': 'Order not found'}), 404
+    
+    # Update order status to paid
+    order.status = 'confirmed'
+    order.updated_at = datetime.now()
+    
+    # Clear payment session
+    session.pop('payment_order_id', None)
+    session.pop('payment_amount', None)
+    
+    flash(f'Payment confirmed! Order #{order_id} is now being processed.', 'success')
+    return jsonify({'success': True, 'redirect': url_for('order_tracking', order_id=order_id)})
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
