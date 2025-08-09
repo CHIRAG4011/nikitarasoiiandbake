@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash
-from models import User, Product, Order, Review, Address, VisitorLog
+from models import User, Product, Order, Review, Address, VisitorLog, Category
 
 # In-memory data storage
 data_store = {
@@ -9,13 +9,15 @@ data_store = {
     'orders': {},
     'reviews': {},
     'addresses': {},
+    'categories': {},
     'visitor_logs': [],
     'counters': {
         'user_id': 1,
         'product_id': 1,
         'order_id': 1,
         'review_id': 1,
-        'address_id': 1
+        'address_id': 1,
+        'category_id': 1
     }
 }
 
@@ -32,6 +34,41 @@ def init_data_store():
     )
     data_store['users'][1] = admin_user
     data_store['counters']['user_id'] = 2
+    
+    # Initialize categories
+    categories_data = [
+        {
+            'name': 'Bread',
+            'description': 'Fresh artisan breads, rolls, and baked goods made daily with premium ingredients.',
+            'image_url': 'https://pixabay.com/get/gf46697f3b2eb0f69055e68cf462fe7f12f666a1cef093298d99ac12155b9f9a73786df5c026a3d306610f736380e291652992b984cc3e2305bb1f72dd7b7831a_1280.jpg'
+        },
+        {
+            'name': 'Pastries',
+            'description': 'Buttery, flaky pastries and croissants made with traditional French techniques.',
+            'image_url': 'https://pixabay.com/get/g7fc235a8396e1e878415cdd61ade6fd8a773e2667829a11c6e2118808a681b4abd2a480212ead51ada7e326f7f210cdbe2aac2c1c8a0ce9310ea0497f2c98d88_1280.jpg'
+        },
+        {
+            'name': 'Muffins',
+            'description': 'Moist and fluffy muffins with various flavors and mix-ins to start your day right.',
+            'image_url': 'https://pixabay.com/get/g002d90cded0d0d8029098ba11a7e534bc2a16e58b1b935f8abf23e301924125103d7e7aa0971c7d3b6044f125aace9b89bfa10cb192bce99d1393e0914d96939_1280.jpg'
+        },
+        {
+            'name': 'Desserts',
+            'description': 'Decadent desserts, tarts, and sweet treats perfect for any special occasion.',
+            'image_url': 'https://pixabay.com/get/g686d80765ed6bf3ee31605efc8f64b836790a4a5520e1d6c6612c4093dabbe17dfec22312d97234015f0cd6a400527d092ea3a0603e2b30529c4cd59a2f45308_1280.jpg'
+        }
+    ]
+    
+    for i, category_data in enumerate(categories_data, 1):
+        category = Category(
+            category_id=i,
+            name=category_data['name'],
+            description=category_data['description'],
+            image_url=category_data['image_url']
+        )
+        data_store['categories'][i] = category
+    
+    data_store['counters']['category_id'] = len(categories_data) + 1
     
     # Sample products with stock photos
     products_data = [

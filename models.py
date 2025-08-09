@@ -74,6 +74,19 @@ class Review:
         self.comment = comment
         self.created_at = created_at or datetime.now()
 
+class Category:
+    def __init__(self, category_id, name, description="", image_url="", is_active=True, created_at=None):
+        self.id = category_id
+        self.name = name
+        self.description = description
+        self.image_url = image_url
+        self.is_active = is_active
+        self.created_at = created_at or datetime.now()
+    
+    def get_product_count(self):
+        from data_store import data_store
+        return len([p for p in data_store['products'].values() if p.category == self.name])
+
 class Address:
     def __init__(self, address_id, user_id, name, street, city, state, zip_code, phone=None, created_at=None):
         self.id = address_id

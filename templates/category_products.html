@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - NIKITA RASOI & BAKES{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Category Header -->
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            {% if category.image_url %}
+            <img src="{{ category.image_url }}" alt="{{ category.name }}" 
+                 class="img-fluid rounded shadow" style="max-height: 300px; object-fit: cover; width: 100%;">
+            {% else %}
+            <div class="bg-light rounded shadow d-flex align-items-center justify-content-center" 
+                 style="height: 300px;">
+                <i class="fas fa-image fa-4x text-muted"></i>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-lg-6 d-flex flex-column justify-content-center">
+            <div class="mb-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('categories') }}">Categories</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+                    </ol>
+                </nav>
+            </div>
+            
+            <h1 class="text-brown mb-3">{{ category.name }}</h1>
+            
+            {% if category.description %}
+            <p class="lead text-muted mb-4">{{ category.description }}</p>
+            {% endif %}
+            
+            <div class="d-flex align-items-center mb-3">
+                <span class="badge bg-brown fs-6 me-3">{{ products|length }} Products Available</span>
+                {% if products|length > 0 %}
+                <span class="text-muted">Starting from ₹{{ products|map(attribute='price')|min|round(2) }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('categories') }}" class="btn btn-outline-brown">
+                    <i class="fas fa-arrow-left me-2"></i>All Categories
+                </a>
+                <a href="{{ url_for('products') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-search me-2"></i>Browse All Products
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    {% if products %}
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="text-brown mb-0">Available Products</h3>
+                <div class="dropdown">
+                    <button class="btn btn-outline-brown dropdown-toggle" type="button" 
+                            id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sort me-2"></i>Sort By
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="sortProducts('name')">Name (A-Z)</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="sortProducts('price-low')">Price (Low to High)</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="sortProducts('price-high')">Price (High to Low)</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="sortProducts('stock')">Stock Level</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="products-grid">
+        {% for product in products %}
+        <div class="col-lg-4 col-md-6 mb-4 product-item" 
+             data-name="{{ product.name|lower }}" 
+             data-price="{{ product.price }}" 
+             data-stock="{{ product.stock }}">
+            <div class="card product-card h-100 shadow-sm">
+                <img src="{{ product.image_url }}" class="card-img-top product-image" 
+                     alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.description[:100] }}...</p>
+                    
+                    <!-- Rating Display -->
+                    <div class="mb-2">
+                        {% set avg_rating = product.get_average_rating() %}
+                        {% if avg_rating > 0 %}
+                        <div class="text-warning">
+                            {% for i in range(5) %}
+                                {% if i < avg_rating %}
+                                <i class="fas fa-star"></i>
+                                {% else %}
+                                <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <small class="text-muted ms-2">({{ avg_rating|round(1) }})</small>
+                        </div>
+                        {% else %}
+                        <div class="text-muted">
+                            <small>No reviews yet</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="h5 text-brown mb-0">₹{{ "%.2f"|format(product.price) }}</span>
+                            {% if product.stock <= 5 and product.stock > 0 %}
+                            <span class="badge bg-warning">Low Stock</span>
+                            {% elif product.stock == 0 %}
+                            <span class="badge bg-danger">Out of Stock</span>
+                            {% else %}
+                            <span class="badge bg-success">In Stock</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" 
+                               class="btn btn-outline-brown btn-sm flex-fill">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            {% if product.stock > 0 %}
+                            <form method="post" action="{{ url_for('add_to_cart_route', product_id=product.id) }}" class="flex-fill">
+                                <button type="submit" class="btn btn-brown btn-sm w-100">
+                                    <i class="fas fa-cart-plus me-1"></i>Add to Cart
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm flex-fill" disabled>
+                                <i class="fas fa-times me-1"></i>Out of Stock
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-bag fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">No products found in {{ category.name }}</h3>
+        <p class="text-muted mb-4">This category doesn't have any products yet. Please check back later!</p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('categories') }}" class="btn btn-brown">
+                <i class="fas fa-tags me-2"></i>Browse Other Categories
+            </a>
+            <a href="{{ url_for('products') }}" class="btn btn-outline-brown">
+                <i class="fas fa-search me-2"></i>View All Products
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.product-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.product-image {
+    transition: transform 0.3s ease-in-out;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.03);
+}
+</style>
+
+<script>
+function sortProducts(sortBy) {
+    const grid = document.getElementById('products-grid');
+    const products = Array.from(grid.children);
+    
+    products.sort((a, b) => {
+        switch(sortBy) {
+            case 'name':
+                return a.dataset.name.localeCompare(b.dataset.name);
+            case 'price-low':
+                return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+            case 'price-high':
+                return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+            case 'stock':
+                return parseInt(b.dataset.stock) - parseInt(a.dataset.stock);
+            default:
+                return 0;
+        }
+    });
+    
+    // Re-append sorted products
+    products.forEach(product => grid.appendChild(product));
+}
+</script>
+{% endblock %}

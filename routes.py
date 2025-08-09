@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import app
-from models import User, Product, Order, Review, Address, OrderItem, VisitorLog
+from models import User, Product, Order, Review, Address, OrderItem, VisitorLog, Category
 from data_store import data_store, add_visitor_log, get_next_id, get_weekly_visitors
 from utils import (get_current_user, add_to_cart, remove_from_cart, update_cart_quantity, 
                   get_cart_total, get_cart_count, clear_cart, send_order_confirmation_email,
@@ -51,13 +51,41 @@ def products():
     else:
         product_list = list(data_store['products'].values())
     
-    categories = list(set(p.category for p in data_store['products'].values()))
+    # Get categories from data store
+    categories = [cat.name for cat in data_store['categories'].values() if cat.is_active]
     
     return render_template('products.html', 
                          products=product_list, 
                          categories=categories,
                          current_query=query,
                          current_category=category)
+
+@app.route('/categories')
+def categories():
+    """Categories page showing all available categories"""
+    active_categories = [cat for cat in data_store['categories'].values() if cat.is_active]
+    return render_template('categories.html', categories=active_categories)
+
+@app.route('/category/<category_name>')
+def category_products(category_name):
+    """Show products for a specific category"""
+    # Get the category object
+    category = None
+    for cat in data_store['categories'].values():
+        if cat.name == category_name and cat.is_active:
+            category = cat
+            break
+    
+    if not category:
+        flash('Category not found.', 'error')
+        return redirect(url_for('products'))
+    
+    # Get products for this category
+    category_products = [p for p in data_store['products'].values() if p.category == category_name]
+    
+    return render_template('category_products.html', 
+                         category=category, 
+                         products=category_products)
 
 @app.route('/product/<int:product_id>')
 def product_detail(product_id):
@@ -549,6 +577,124 @@ def admin_users():
     
     users = list(data_store['users'].values())
     return render_template('admin/users.html', users=users)
+
+@app.route('/admin/categories')
+def admin_categories():
+    """Admin category management"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    categories = list(data_store['categories'].values())
+    return render_template('admin/categories.html', categories=categories)
+
+@app.route('/admin/add_category', methods=['GET', 'POST'])
+def admin_add_category():
+    """Add new category"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+        image_url = request.form.get('image_url', '').strip()
+        
+        if not name:
+            flash('Category name is required.', 'error')
+            return render_template('admin/add_category.html')
+        
+        # Check if category name already exists
+        existing_category = None
+        for cat in data_store['categories'].values():
+            if cat.name.lower() == name.lower():
+                existing_category = cat
+                break
+        
+        if existing_category:
+            flash('Category with this name already exists.', 'error')
+            return render_template('admin/add_category.html')
+        
+        # Create new category
+        category_id = get_next_id('category_id')
+        new_category = Category(
+            category_id=category_id,
+            name=name,
+            description=description,
+            image_url=image_url
+        )
+        
+        data_store['categories'][category_id] = new_category
+        flash(f'Category "{name}" added successfully!', 'success')
+        return redirect(url_for('admin_categories'))
+    
+    return render_template('admin/add_category.html')
+
+@app.route('/admin/edit_category/<int:category_id>', methods=['GET', 'POST'])
+def admin_edit_category(category_id):
+    """Edit existing category"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    category = data_store['categories'].get(category_id)
+    if not category:
+        flash('Category not found.', 'error')
+        return redirect(url_for('admin_categories'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+        image_url = request.form.get('image_url', '').strip()
+        is_active = request.form.get('is_active') == 'on'
+        
+        if not name:
+            flash('Category name is required.', 'error')
+            return render_template('admin/edit_category.html', category=category)
+        
+        # Check if category name already exists (excluding current category)
+        existing_category = None
+        for cat in data_store['categories'].values():
+            if cat.name.lower() == name.lower() and cat.id != category_id:
+                existing_category = cat
+                break
+        
+        if existing_category:
+            flash('Category with this name already exists.', 'error')
+            return render_template('admin/edit_category.html', category=category)
+        
+        # Update category
+        category.name = name
+        category.description = description
+        category.image_url = image_url
+        category.is_active = is_active
+        
+        flash(f'Category "{name}" updated successfully!', 'success')
+        return redirect(url_for('admin_categories'))
+    
+    return render_template('admin/edit_category.html', category=category)
+
+@app.route('/admin/toggle_category_status/<int:category_id>', methods=['POST'])
+def admin_toggle_category_status(category_id):
+    """Toggle category active status"""
+    user = get_current_user()
+    if not user or not user.is_admin:
+        flash('Access denied.', 'error')
+        return redirect(url_for('index'))
+    
+    category = data_store['categories'].get(category_id)
+    if not category:
+        flash('Category not found.', 'error')
+        return redirect(url_for('admin_categories'))
+    
+    category.is_active = not category.is_active
+    status = "activated" if category.is_active else "deactivated"
+    flash(f'Category "{category.name}" {status} successfully!', 'success')
+    
+    return redirect(url_for('admin_categories'))
 
 @app.route('/admin/toggle_admin/<int:user_id>', methods=['POST'])
 def toggle_admin(user_id):
